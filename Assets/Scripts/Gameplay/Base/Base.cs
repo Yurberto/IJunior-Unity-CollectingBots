@@ -8,10 +8,13 @@ public class Base : MonoBehaviour
 
     public void Initialize(Robot robot, Scanner scaner)
     {
-        _resourceScaner = GetComponent<BaseResourceScaner>();
-
         _robot = robot;
         _resourceScaner.Initialize(scaner);
+    }
+
+    private void Awake()
+    {
+        _resourceScaner = GetComponent<BaseResourceScaner>();
     }
 
     private void Start()
@@ -35,15 +38,6 @@ public class Base : MonoBehaviour
             return;
 
         target.OnChase();
-        _robot.MoveTo(target.transform);
-
-        _robot.ResourceCollected += SendRobotBase;
-    }
-
-    private void SendRobotBase()
-    {
-        _robot.MoveTo(transform);
-
-        _robot.ResourceCollected -= SendRobotBase;
+        _robot.MoveTo(target.transform.position);
     }
 }

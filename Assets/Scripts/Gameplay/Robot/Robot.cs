@@ -1,47 +1,56 @@
 using System;
 using UnityEngine;
 
-[RequireComponent(typeof(RobotMover))]
+[RequireComponent(typeof(Mover))]
 [RequireComponent(typeof(ResourceCollector))]
-[RequireComponent(typeof(ResourceDetector))]
+[RequireComponent(typeof(TriggerHandler))]
 public class Robot : MonoBehaviour
 {
-    private RobotMover _robotMover;
+    private Mover _mover;
     private ResourceCollector _resourceCollector;
-    private ResourceDetector _resourceDetector;
+    private TriggerHandler _resourceDetector;
 
+    private Vector3 _startPosition;
     private bool _isWork = false;
-
-    public event Action ResourceCollected;
 
     public bool IsWork => _isWork;
 
     private void Awake()
     {
-        _robotMover = GetComponent<RobotMover>();
+        _mover = GetComponent<Mover>();
         _resourceCollector = GetComponent<ResourceCollector>();
-        _resourceDetector = GetComponent<ResourceDetector>();
+        _resourceDetector = GetComponent<TriggerHandler>();
+
+        _startPosition = transform.position;
     }
 
     private void OnEnable()
     {
         _resourceDetector.AvailableResourceHitted += Collect;
+        _resourceDetector.SpawnTrggierHitted += _mover.Stop;
     }
 
     private void OnDisable()
     {
         _resourceDetector.AvailableResourceHitted -= Collect;
+        _resourceDetector.SpawnTrggierHitted -= _mover.Stop;
     }
 
-    public void MoveTo(Transform target)
+    public void MoveTo(Vector3 target)
     {
         _isWork = true;
-        _robotMover.MoveTo(target);
+        _mover.MoveTo(target);
     }
 
     private void Collect(Resource resource)
     {
+        _mover.Stop();
         _resourceCollector.Collect(resource);
-        ResourceCollected?.Invoke();
+        GoToStartPosition();
+    }
+
+    private void GoToStartPosition()
+    {
+        _mover.MoveTo(_startPosition);
     }
 }
