@@ -4,13 +4,13 @@ using UnityEngine;
 
 [RequireComponent(typeof(Collider))]
 [RequireComponent(typeof(Mover))]
-[RequireComponent(typeof(TriggerHandler))]
-[RequireComponent(typeof(ResourceCollector))]
+[RequireComponent(typeof(ResourceDeliverer))]
 public class Robot : MonoBehaviour
 {
+    [SerializeField, Range(0.0f, 5.0f)] private float _reachedDistance = 1.0f;
+
     private Mover _mover;
-    private TriggerHandler _triggerHandler;
-    private ResourceCollector _resourceCollector;
+    private ResourceDeliverer _resourceDeliverer;
 
     private Resource _currentResource;
 
@@ -30,8 +30,7 @@ public class Robot : MonoBehaviour
     private void Awake()
     {
         _mover = GetComponent<Mover>();
-        _triggerHandler = GetComponent<TriggerHandler>();
-        _resourceCollector = GetComponent<ResourceCollector>();
+        _resourceDeliverer = GetComponent<ResourceDeliverer>();
     }
 
     private void Start()
@@ -39,45 +38,34 @@ public class Robot : MonoBehaviour
         GetComponent<Collider>().isTrigger = true;
     }
 
-    private void OnEnable()
-    {
-        _triggerHandler.ResourceHitted += BackToBase;
-    }
-
-    private void OnDisable()
-    {
-        _triggerHandler.ResourceHitted -= BackToBase;
-    }
-
-    public void MoveTo(Vector3 target)
+    public void GoPickUp(Resource target)
     {
         _isWork = true;
-        _mover.MoveTo(target);
+        _currentResource = target;
+        _mover.MoveTo(target.transform.position);
+
+        StartCoroutine(GoPickUpCoroutine());
     }
 
-    private void BackToBase(Resource resource)
+    private IEnumerator GoPickUpCoroutine()
     {
-        if (_currentResource != null) 
-            return;
+        yield return new WaitUntil(() => Vector3.Distance(transform.position, _currentResource.transform.position) < _reachedDistance);
 
-        _currentResource = resource;
+        _resourceDeliverer.PickUp(_currentResource);
+        BackToBase();
+    }
 
-        PickUp();
+    private void BackToBase()
+    {
+        _resourceDeliverer.PickUp(_currentResource);
+        _mover.MoveTo(_startPosition);
 
         StartCoroutine(PutInOnBase());
     }
 
-    private void PickUp()
-    {
-        _resourceCollector.PickUp(_currentResource);
-        _mover.MoveTo(_startPosition);
-    }
-
     private IEnumerator PutInOnBase()
     {
-        float reachedDistance = 0.2f;
-
-        yield return new WaitUntil(() => Vector3.Distance(transform.position, _startPosition) < reachedDistance);
+        yield return new WaitUntil(() => Vector3.Distance(transform.position, _startPosition) < _reachedDistance);
 
         PutIn();
         _mover.Stop();

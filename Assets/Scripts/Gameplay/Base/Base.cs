@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -12,6 +13,8 @@ public class Base : MonoBehaviour
     private Scanner _scanner;
 
     private int _resourceCount = 0;
+
+    public event Action<int> ResourceValueChanged;
 
     public void Initialize(RobotSpawner robotSpawner, Scanner scanner)
     {
@@ -32,9 +35,7 @@ public class Base : MonoBehaviour
         int startRobotValue = 3;
 
         for (int i = 0; i < startRobotValue; i++)
-        {
             CreateRobot();
-        }
     }
 
     private void OnEnable()
@@ -69,7 +70,7 @@ public class Base : MonoBehaviour
         {
             if (_robots[i].IsWork == false)
             {
-                _robots[i].MoveTo(resource.transform.position);
+                _robots[i].GoPickUp(resource);
                 robotSended = true;
                 break;
             }
@@ -82,6 +83,6 @@ public class Base : MonoBehaviour
     private void CollectResource(Resource resource)
     {
         resource.OnCollect();
-        _resourceCount++;
+        ResourceValueChanged?.Invoke(++_resourceCount);
     }
 }
