@@ -1,48 +1,51 @@
-using System.Collections.Generic;
+using System;
+using System.Collections;
 using UnityEngine;
 
 public class Scanner : MonoBehaviour
 {
-    [SerializeField] private Vector3 _scanBoxSize;
+    [SerializeField, Range(0.0f, 10.0f)] private float _scanDelay = 0.2f;
     [Space]
-    [SerializeField, Range(0, 100)] private int _maxScannedColliders = 20;
+    [SerializeField] private Vector3 _scanSize = Vector3.one;
+    [SerializeField, Range(0, 50)] private int _overlapCollidersValue;
 
-    private Collider[] _scanned;
+    private Coroutine _scanCoroutine;
 
-    private void OnValidate()
+    public event Action<Resource> ResourceScanned;
+
+    public void StartScan()
     {
-        _scanBoxSize.x = Mathf.Max(0, _scanBoxSize.x);
-        _scanBoxSize.y = Mathf.Max(0, _scanBoxSize.y);
-        _scanBoxSize.z = Mathf.Max(0, _scanBoxSize.z);
+        _scanCoroutine = StartCoroutine(ScanCoroutine());
     }
 
-    private void Awake()
+    public bool TryScan(out Resource collectableResource)
     {
-        _scanned = new Collider[_maxScannedColliders];
-    }
-
-    public bool TryScanResources(out Resource[] resourcesToScan)
-    {
-        List<Resource> scannedResources = new List<Resource>();
-
-        Vector3 scanBoxExtents = _scanBoxSize / 2;
-        int hittedCount = Physics.OverlapBoxNonAlloc(transform.position, scanBoxExtents, _scanned);
+        Collider[] hitted = new Collider[_overlapCollidersValue];
+        int hittedCount = Physics.OverlapBoxNonAlloc(transform.position, _scanSize, hitted, Quaternion.identity, LayerData.Resource);
 
         for (int i = 0; i < hittedCount; i++)
         {
-            if (_scanned[i].TryGetComponent(out Resource resource) && resource.CanBeCollect)
-                scannedResources.Add(resource);
+            if (hitted[i].TryGetComponent(out Resource resource) && resource.CanBeCollect)
+            {
+                collectableResource = resource;
+                return true;
+            }
         }
 
-        if (scannedResources.Count > 0)
+        collectableResource = null;
+        return false;
+    }
+
+    private IEnumerator ScanCoroutine()
+    {
+        var wait = new WaitForSeconds(_scanDelay);
+
+        while (enabled)
         {
-            resourcesToScan = scannedResources.ToArray();
-            return true;
-        }
-        else
-        {
-            resourcesToScan = null;
-            return false;
+            if (TryScan(out Resource resource))
+                ResourceScanned?.Invoke(resource);
+
+            yield return wait;
         }
     }
 }

@@ -1,48 +1,55 @@
 using System.Collections.Generic;
 using UnityEngine;
+using IEnumerator = System.Collections.IEnumerator;
 
 public class ResourceSpawner : Spawner<Resource>
 {
+    [Space(16)]
+    [SerializeField] private SpawnpointContainer _spawnpointsContainer;
     [Space]
-    [SerializeField] private Transform _spawnpointContainer;
+    [SerializeField, Range(0.0f, 50.0f)] private float _spawnDelay = 1.0f;
 
-    private Transform[] _spawnpoints;
-    private List<Transform> _availableSpawnpoints;
+    private List<Vector3> _availableSpawpoints = new List<Vector3>();
 
-    protected override void Awake()
-    {
-        base.Awake();
-
-        _spawnpoints = new Transform[_spawnpointContainer.childCount];
-
-        for (int i = 0; i < _spawnpoints.Length; i++)
-            _spawnpoints[i] = _spawnpointContainer.GetChild(i);
-
-        _availableSpawnpoints = new List<Transform>(_spawnpoints);
-    }
+    private Coroutine _spawnCoroutine;
 
     private void Start()
     {
-        Spawn();
-        Spawn();
-        Spawn();
-        Spawn();
+        _availableSpawpoints = _spawnpointsContainer.Spawnpoints;
+
+        _spawnCoroutine = StartCoroutine(SpawnCoroutine());
     }
 
     public override Resource Spawn()
     {
+        if (_availableSpawpoints.Count == 0)
+            return null;
+
         Resource spawned = base.Spawn();
-        spawned.transform.position = GetRandomPosition();
+        spawned.Initialize(SpawnUtils.GetSpawnPosition(_availableSpawpoints));
+
+        spawned.ReleaseTimeCome += Release;
 
         return spawned;
     }
 
-    private Vector3 GetRandomPosition()
+    protected override void Release(Resource objectToRelease)
     {
-        int randomIndex = Random.Range(0, _availableSpawnpoints.Count);
-        Vector3 randomPosition = _availableSpawnpoints[randomIndex].position;
-        _availableSpawnpoints.RemoveAt(randomIndex);
+        base.Release(objectToRelease);
+        objectToRelease.transform.parent = ParentContainer;
+        _availableSpawpoints.Add(objectToRelease.SpawnPosition);
 
-        return randomPosition;
+        objectToRelease.ReleaseTimeCome -= Release;
+    }
+
+    private IEnumerator SpawnCoroutine()
+    {
+        var wait = new WaitForSeconds(_spawnDelay);
+
+        while (enabled)
+        {
+            yield return wait;
+            Spawn();
+        }
     }
 }

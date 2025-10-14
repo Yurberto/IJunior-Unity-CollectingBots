@@ -3,13 +3,13 @@ using UnityEngine;
 public abstract class Spawner<T> : MonoBehaviour where T : MonoBehaviour
 {
     [SerializeField] protected T Prefab;
-    [SerializeField] private Transform _parentContainer;
+    [SerializeField] protected Transform ParentContainer;
 
     private GameObjectPool<T> _pool;
 
     protected virtual void Awake()
     {
-        _pool = new GameObjectPool<T>(() => Instantiate(Prefab, _parentContainer));
+        _pool = new GameObjectPool<T>(() => Instantiate(Prefab, ParentContainer));
     }
 
     public virtual T Spawn()

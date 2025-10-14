@@ -1,13 +1,13 @@
 using UnityEngine;
 
-public class Bootstrap : MonoBehaviour
+public class Test : MonoBehaviour
 {
     [SerializeField] private Base _base;
-    [SerializeField] private Robot _robot;
+    [SerializeField] private RobotSpawner _robotSpawner;
     [SerializeField] private Scanner _scanner;
 
     private void Awake()
     {
-        _base.Initialize(_robot, _scanner);
+        _base.Initialize(_robotSpawner, _scanner);
     }
 }

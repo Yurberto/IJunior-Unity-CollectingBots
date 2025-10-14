@@ -1,26 +1,42 @@
+using System;
 using UnityEngine;
 
+[RequireComponent(typeof(Collider))]
 public class Resource : MonoBehaviour
 {
-    private bool _canBeChased = true;
-    private bool _canBeCollected = true;
+    private Vector3 _spawnPosition;
 
-    public bool CanBeChased => _canBeChased;
-    public bool CanBeCollect => _canBeCollected;
+    private bool _canBeCollect = true;
 
-    public void OnChase()
+    public event Action<Resource> ReleaseTimeCome;
+
+    public Vector3 SpawnPosition => _spawnPosition;
+    public bool CanBeCollect => _canBeCollect;
+
+    public void Initialize(Vector3 spawnPosition)
     {
-        _canBeChased = false;
+        _spawnPosition = spawnPosition;
+        transform.position = spawnPosition;
+    }
+
+    private void Start()
+    {
+        GetComponent<Collider>().isTrigger = true;
+    }
+
+    public void OnChasing()
+    {
+        _canBeCollect = false;
     }
 
     public void OnCollect()
     {
-        _canBeCollected = false;
+        ReleaseTimeCome?.Invoke(this);
+        _canBeCollect = true;
     }
 
-    private void OnDisable()
+    public void MakeCollectable()
     {
-        _canBeChased = true;
-        _canBeCollected = true;
+        _canBeCollect = true;
     }
 }

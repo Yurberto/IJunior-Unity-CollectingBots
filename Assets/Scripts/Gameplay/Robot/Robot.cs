@@ -1,39 +1,52 @@
 using System;
+using System.Collections;
 using UnityEngine;
 
+[RequireComponent(typeof(Collider))]
 [RequireComponent(typeof(Mover))]
-[RequireComponent(typeof(ResourceCollector))]
 [RequireComponent(typeof(TriggerHandler))]
+[RequireComponent(typeof(ResourceCollector))]
 public class Robot : MonoBehaviour
 {
     private Mover _mover;
+    private TriggerHandler _triggerHandler;
     private ResourceCollector _resourceCollector;
-    private TriggerHandler _resourceDetector;
+
+    private Resource _currentResource;
 
     private Vector3 _startPosition;
     private bool _isWork = false;
 
+    public event Action<Resource> ResourceDelivered;
+
     public bool IsWork => _isWork;
+
+    public void Initialize(Vector3 startPosition)
+    {
+        _startPosition = startPosition;
+        transform.position = _startPosition;
+    }
 
     private void Awake()
     {
         _mover = GetComponent<Mover>();
+        _triggerHandler = GetComponent<TriggerHandler>();
         _resourceCollector = GetComponent<ResourceCollector>();
-        _resourceDetector = GetComponent<TriggerHandler>();
+    }
 
-        _startPosition = transform.position;
+    private void Start()
+    {
+        GetComponent<Collider>().isTrigger = true;
     }
 
     private void OnEnable()
     {
-        _resourceDetector.AvailableResourceHitted += Collect;
-        _resourceDetector.SpawnTrggierHitted += _mover.Stop;
+        _triggerHandler.ResourceHitted += BackToBase;
     }
 
     private void OnDisable()
     {
-        _resourceDetector.AvailableResourceHitted -= Collect;
-        _resourceDetector.SpawnTrggierHitted -= _mover.Stop;
+        _triggerHandler.ResourceHitted -= BackToBase;
     }
 
     public void MoveTo(Vector3 target)
@@ -42,15 +55,40 @@ public class Robot : MonoBehaviour
         _mover.MoveTo(target);
     }
 
-    private void Collect(Resource resource)
+    private void BackToBase(Resource resource)
     {
-        _mover.Stop();
-        _resourceCollector.Collect(resource);
-        GoToStartPosition();
+        if (_currentResource != null) 
+            return;
+
+        _currentResource = resource;
+
+        PickUp();
+
+        StartCoroutine(PutInOnBase());
     }
 
-    private void GoToStartPosition()
+    private void PickUp()
     {
+        _resourceCollector.PickUp(_currentResource);
         _mover.MoveTo(_startPosition);
+    }
+
+    private IEnumerator PutInOnBase()
+    {
+        float reachedDistance = 0.2f;
+
+        yield return new WaitUntil(() => Vector3.Distance(transform.position, _startPosition) < reachedDistance);
+
+        PutIn();
+        _mover.Stop();
+        transform.rotation = Quaternion.identity;
+    }
+
+    private void PutIn()
+    {
+        ResourceDelivered?.Invoke(_currentResource);
+
+        _currentResource = null;
+        _isWork = false;
     }
 }

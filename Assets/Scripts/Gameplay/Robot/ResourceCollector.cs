@@ -2,24 +2,16 @@ using UnityEngine;
 
 public class ResourceCollector : MonoBehaviour
 {
-    private CarryingPoint _carryingPoint;
-
-    private Resource _collectedResource;
-
-    public Resource CollectedResource => _collectedResource;
+    private PickUpPoint _pickUpPoint;
 
     private void Awake()
     {
-        _carryingPoint = GetComponentInChildren<CarryingPoint>();
+        _pickUpPoint = GetComponentInChildren<PickUpPoint>();
     }
 
-    public void Collect(Resource resource)
+    public void PickUp(Resource resource)
     {
-        resource.OnCollect();
-
-        resource.transform.parent = _carryingPoint.transform;
-        resource.transform.position = _carryingPoint.transform.position;
-
-        _collectedResource = resource;
+        resource.transform.parent = _pickUpPoint.transform;
+        resource.transform.position = _pickUpPoint.transform.position;
     }
 }

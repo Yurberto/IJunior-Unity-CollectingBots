@@ -1,43 +1,87 @@
+using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(BaseResourceScaner))]
 public class Base : MonoBehaviour
 {
-    private BaseResourceScaner _resourceScaner;
-    private Robot _robot;
+    private List<Robot> _robots = new List<Robot>();
 
-    public void Initialize(Robot robot, Scanner scaner)
+    private SpawnpointContainer _robotSpawnpointContainer;
+    private List<Vector3> _availableRobotSpawnpoints;
+
+    private RobotSpawner _robotSpawner;
+    private Scanner _scanner;
+
+    private int _resourceCount = 0;
+
+    public void Initialize(RobotSpawner robotSpawner, Scanner scanner)
     {
-        _robot = robot;
-        _resourceScaner.Initialize(scaner);
+        _robotSpawner = robotSpawner;
+        _scanner = scanner;
     }
 
     private void Awake()
     {
-        _resourceScaner = GetComponent<BaseResourceScaner>();
+        _robotSpawnpointContainer = GetComponentInChildren<SpawnpointContainer>();
+        _availableRobotSpawnpoints = _robotSpawnpointContainer.Spawnpoints;
     }
 
     private void Start()
     {
-        _resourceScaner.StartDetect();
+        _scanner.StartScan();
+
+        int startRobotValue = 3;
+
+        for (int i = 0; i < startRobotValue; i++)
+        {
+            CreateRobot();
+        }
     }
 
     private void OnEnable()
     {
-        _resourceScaner.NearestDetected += SendRobotCollect;
+        _scanner.ResourceScanned += SendRobot;
     }
 
     private void OnDisable()
     {
-        _resourceScaner.NearestDetected -= SendRobotCollect;
+        foreach (Robot robot in _robots)
+        {
+            robot.ResourceDelivered -= CollectResource;
+        }
+
+        _scanner.ResourceScanned -= SendRobot;
     }
 
-    private void SendRobotCollect(Resource target)
+    private void CreateRobot()
     {
-        if (_robot.IsWork)
-            return;
+        Robot spawned = _robotSpawner.Spawn();
+        spawned.Initialize(SpawnUtils.GetSpawnPosition(_availableRobotSpawnpoints));
+        spawned.ResourceDelivered += CollectResource;
+        _robots.Add(spawned);
+    }
 
-        target.OnChase();
-        _robot.MoveTo(target.transform.position);
+    private void SendRobot(Resource resource)
+    {
+        resource.OnChasing();
+        bool robotSended = false;
+
+        for (int i = 0; i < _robots.Count; i++)
+        {
+            if (_robots[i].IsWork == false)
+            {
+                _robots[i].MoveTo(resource.transform.position);
+                robotSended = true;
+                break;
+            }
+        }
+
+        if (robotSended == false) 
+            resource.MakeCollectable();
+    }
+
+    private void CollectResource(Resource resource)
+    {
+        resource.OnCollect();
+        _resourceCount++;
     }
 }
