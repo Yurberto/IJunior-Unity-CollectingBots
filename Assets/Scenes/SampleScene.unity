@@ -849,7 +849,7 @@ GameObject:
   - component: {fileID: 985145377}
   - component: {fileID: 985145376}
   m_Layer: 0
-  m_Name: Bootstrap
+  m_Name: Bootstraper
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -869,7 +869,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _base: {fileID: 1792270985}
   _robotSpawner: {fileID: 1706832258}
-  _scanner: {fileID: 1381818683}
+  _resourceSpawner: {fileID: 2126420742}
   _resourceViewer: {fileID: 1922803098}
 --- !u!4 &985145377
 Transform:
@@ -947,53 +947,6 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2044493938}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1381818682
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1381818684}
-  - component: {fileID: 1381818683}
-  m_Layer: 0
-  m_Name: Scanner
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1381818683
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1381818682}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 75fd1f3aaaedc084dacc90ac7cd3bfab, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _scanDelay: 0.2
-  _scanSize: {x: 50, y: 2, z: 50}
-  _overlapCollidersValue: 20
---- !u!4 &1381818684
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1381818682}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: -30}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1414537004
 GameObject:
@@ -1656,7 +1609,7 @@ MonoBehaviour:
   Prefab: {fileID: 3528135791703170908, guid: 53b3d18f18b6c5749aeb113d043f4e4d, type: 3}
   ParentContainer: {fileID: 2126420743}
   _spawnpointsContainer: {fileID: 2044493939}
-  _spawnDelay: 0.5
+  _spawnDelay: 0.7
 --- !u!4 &2126420743
 Transform:
   m_ObjectHideFlags: 0
@@ -1686,6 +1639,5 @@ SceneRoots:
   - {fileID: 1943823978}
   - {fileID: 1792270987}
   - {fileID: 985145377}
-  - {fileID: 1381818684}
   - {fileID: 389826634}
   - {fileID: 215087788}

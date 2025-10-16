@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using IEnumerator = System.Collections.IEnumerator;
 
-public class ResourceSpawner : Spawner<Resource>
+public class ResourceSpawner : PoolSpawner<Resource>
 {
     [Space(16)]
     [SerializeField] private SpawnpointContainer _spawnpointsContainer;
@@ -10,8 +10,11 @@ public class ResourceSpawner : Spawner<Resource>
     [SerializeField, Range(0.0f, 50.0f)] private float _spawnDelay = 1.0f;
 
     private List<Vector3> _availableSpawpoints = new List<Vector3>();
+    private ResourceHub _hub = new ResourceHub();
 
     private Coroutine _spawnCoroutine;
+
+    public ResourceHub Hub => _hub;
 
     private void Start()
     {
@@ -27,6 +30,7 @@ public class ResourceSpawner : Spawner<Resource>
 
         Resource spawned = base.Spawn();
         spawned.Initialize(SpawnUtils.GetSpawnPosition(_availableSpawpoints));
+        _hub.Add(spawned);
 
         spawned.ReleaseTimeCome += Release;
 

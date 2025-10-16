@@ -1,15 +1,15 @@
 using UnityEngine;
 
-public class Bootstrap : MonoBehaviour
+public class Bootstrapper : MonoBehaviour
 {
     [SerializeField] private Base _base;
     [SerializeField] private RobotSpawner _robotSpawner;
-    [SerializeField] private Scanner _scanner;
+    [SerializeField] private ResourceSpawner _resourceSpawner;
     [SerializeField] private ResourceViewer _resourceViewer;
 
     private void Awake()
     {
-        _base.Initialize(_robotSpawner, _scanner);
+        _base.Initialize(_robotSpawner, _resourceSpawner.Hub);
     }
 
     private void OnEnable()
