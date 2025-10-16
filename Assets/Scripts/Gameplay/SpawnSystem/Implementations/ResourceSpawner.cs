@@ -23,11 +23,6 @@ public class ResourceSpawner : PoolSpawner<Resource>
         _spawnCoroutine = StartCoroutine(SpawnCoroutine());
     }
 
-    private void Update()
-    {
-        _hub.Show();
-    }
-
     public override Resource Spawn()
     {
         if (_availableSpawpoints.Count == 0)
