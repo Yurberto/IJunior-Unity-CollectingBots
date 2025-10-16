@@ -10,17 +10,22 @@ public class ResourceSpawner : PoolSpawner<Resource>
     [SerializeField, Range(0.0f, 50.0f)] private float _spawnDelay = 1.0f;
 
     private List<Vector3> _availableSpawpoints = new List<Vector3>();
-    private ResourceHub _hub = new ResourceHub();
+    private Hub<Resource> _hub = new Hub<Resource>();
 
     private Coroutine _spawnCoroutine;
 
-    public ResourceHub Hub => _hub;
+    public Hub<Resource> Hub => _hub;
 
     private void Start()
     {
         _availableSpawpoints = _spawnpointsContainer.Spawnpoints;
 
         _spawnCoroutine = StartCoroutine(SpawnCoroutine());
+    }
+
+    private void Update()
+    {
+        _hub.Show();
     }
 
     public override Resource Spawn()

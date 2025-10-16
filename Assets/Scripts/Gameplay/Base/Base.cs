@@ -16,7 +16,7 @@ public class Base : MonoBehaviour
 
     public event Action<int> ResourceValueChanged;
 
-    public void Initialize(RobotSpawner robotSpawner, ResourceHub resourceHub)
+    public void Initialize(RobotSpawner robotSpawner, Hub<Resource> resourceHub)
     {
         _robotSpawner = robotSpawner;
         _scanner = new ResourceScanner(resourceHub);

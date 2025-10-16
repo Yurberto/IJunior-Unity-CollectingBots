@@ -7,13 +7,13 @@ public class ResourceScanner
 {
     [SerializeField, Range(0.0f, 10.0f)] private float _scanDelay = 0.2f;
 
-    private ResourceHub _resourceHub;
+    private Hub<Resource> _resourceHub;
 
     private CancellationTokenSource _cancellationTokenSource;
 
     public event Action<Resource> ResourceScanned;
 
-    public ResourceScanner(ResourceHub resourceHub)
+    public ResourceScanner(Hub<Resource> resourceHub)
     {
         _resourceHub = resourceHub;
     }

@@ -1,14 +1,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class Hub<T> where T : MonoBehaviour
+public class Hub<T> where T : MonoBehaviour
 {
     private List<T> _availableObjects = new List<T>();
-    private List<T> _busyObjects = new List<T>();
+    private HashSet<T> _busyObjects = new HashSet<T>();
 
-    public void Add(T resource)
+    public void Add(T @object)
     {
-        _availableObjects.Add(resource);
+        _availableObjects.Add(@object);
     }
 
     public bool TryGetAvailable(out T available)
