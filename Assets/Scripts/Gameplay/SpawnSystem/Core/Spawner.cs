@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class Spawner<T> : MonoBehaviour where T : MonoBehaviour
+public abstract class Spawner<T> : MonoBehaviour where T : MonoBehaviour
 {
     [SerializeField] protected T Prefab;
     [SerializeField] protected Transform ParentContainer;
