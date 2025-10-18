@@ -33,7 +33,6 @@ public class Robot : MonoBehaviour
     {
         _mover = GetComponent<Mover>();
         _resourceDeliverer = GetComponent<ResourceDeliverer>();
-        GetComponent<Collider>().isTrigger = true;
     }
 
     private void Start()

@@ -68,7 +68,7 @@ public class ResourceScanner : MonoBehaviour
         {
             if (_scanned[i].TryGetComponent(out Resource resource))
 
-            _resourceHub.Add(resource);
+            _resourceHub.SetAvailable(resource);
         }
     }
 }

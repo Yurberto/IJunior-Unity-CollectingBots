@@ -23,11 +23,15 @@ public class ResourceSpawner : PoolSpawner<Resource>
         _availableSpawpoints = _spawnpointsContainer.Spawnpoints;
 
         StartSpawn();
+
+        ObjectInstantiated += _hub.Add;
     }
 
     private void OnDisable()
     {
         StopSpawn();
+
+        ObjectInstantiated -= _hub.Add;
     }
 
     public override Resource Spawn()
@@ -37,7 +41,6 @@ public class ResourceSpawner : PoolSpawner<Resource>
 
         Resource spawned = base.Spawn();
         spawned.Initialize(SpawnUtils.GetSpawnPosition(_availableSpawpoints));
-        _hub.Add(spawned);
 
         spawned.ReleaseTimeCome += Release;
 
