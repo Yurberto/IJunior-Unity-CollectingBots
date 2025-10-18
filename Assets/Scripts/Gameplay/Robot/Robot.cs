@@ -1,10 +1,8 @@
-using Cysharp.Threading.Tasks;
 using System;
-using System.Collections;
 using System.Threading;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
-[RequireComponent(typeof(Collider))]
 [RequireComponent(typeof(Mover))]
 [RequireComponent(typeof(ResourceDeliverer))]
 public class Robot : MonoBehaviour
@@ -39,7 +37,6 @@ public class Robot : MonoBehaviour
 
     private void Start()
     {
-        GetComponent<Collider>().isTrigger = true;
         _cancellationTokenSource = new CancellationTokenSource();
     }
 
