@@ -1,58 +1,61 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 public class Base : MonoBehaviour
 {
+    [SerializeField] private SpawnpointContainer _robotSpawnpointContainer;
+    [SerializeField, Range(0.0f, 10.0f)] private float _workDelay = 3f;
+
     private List<Robot> _robots = new List<Robot>();
-    private ResourceScanner _scanner;
-
-    private SpawnpointContainer _robotSpawnpointContainer;
-    private List<Vector3> _availableRobotSpawnpoints;
-
     private RobotSpawner _robotSpawner;
 
-    private int _resourceCount = 0;
+    private List<Vector3> _availableRobotSpawnpoints;
+
+    private Hub<Resource> _resourceHub;
+    private ResourceMonitor _resourceMonitor = new ResourceMonitor();
+
+    private CancellationTokenSource _cancellationTokenSource;
 
     public event Action<int> ResourceValueChanged;
-
+    
     public void Initialize(RobotSpawner robotSpawner, Hub<Resource> resourceHub)
     {
         _robotSpawner = robotSpawner;
-        _scanner = new ResourceScanner(resourceHub);
+        _resourceHub = resourceHub;
     }
 
     private void Awake()
     {
-        _robotSpawnpointContainer = GetComponentInChildren<SpawnpointContainer>();
         _availableRobotSpawnpoints = _robotSpawnpointContainer.Spawnpoints;
     }
 
     private void Start()
     {
-        int startRobotValue = 3;
-
-        for (int i = 0; i < startRobotValue; i++)
-            CreateRobot();
+        CreateRobot();
+        CreateRobot();
+        CreateRobot();
     }
 
     private void OnEnable()
     {
-        _scanner.StartScan().Forget();
+        StartWork().Forget();
 
-        _scanner.ResourceScanned += SendRobot;
+        _resourceMonitor.CountChanged += OnResourceCountChanged;
     }
 
     private void OnDisable()
     {
-        _scanner.StopScan();
+        StopWork();
 
         foreach (Robot robot in _robots)
         {
             robot.ResourceDelivered -= CollectResource;
         }
 
-        _scanner.ResourceScanned -= SendRobot;
+        _resourceMonitor.CountChanged -= OnResourceCountChanged;
     }
 
     private void CreateRobot()
@@ -60,6 +63,7 @@ public class Base : MonoBehaviour
         Robot spawned = _robotSpawner.Spawn();
         spawned.Initialize(SpawnUtils.GetSpawnPosition(_availableRobotSpawnpoints));
         _robots.Add(spawned);
+        Debug.Log("Spawn Robot");
 
         spawned.ResourceDelivered += CollectResource;
     }
@@ -78,8 +82,33 @@ public class Base : MonoBehaviour
 
     private void CollectResource(Resource resource)
     {
-        ResourceValueChanged?.Invoke(++_resourceCount);
+        _resourceMonitor.AddResource();
 
         resource.InvokeRelease();
+    }
+
+    private void OnResourceCountChanged(int value)
+    {
+        ResourceValueChanged?.Invoke(value);
+    }
+
+    private async UniTaskVoid StartWork()
+    {
+        _cancellationTokenSource = new CancellationTokenSource();
+
+        while (enabled)
+        {
+            await UniTask.Delay(TimeSpan.FromSeconds(_workDelay), cancellationToken: _cancellationTokenSource.Token);
+
+            if (_resourceHub.HasAvailable)
+                SendRobot(_resourceHub.GetAvailable());
+        }
+    }
+
+    private void StopWork()
+    {
+        _cancellationTokenSource.Cancel();
+        _cancellationTokenSource.Dispose();
+        _cancellationTokenSource = null;
     }
 }

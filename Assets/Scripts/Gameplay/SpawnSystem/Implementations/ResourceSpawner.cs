@@ -1,6 +1,8 @@
+using Cysharp.Threading.Tasks;
+using System;
 using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
-using IEnumerator = System.Collections.IEnumerator;
 
 public class ResourceSpawner : PoolSpawner<Resource>
 {
@@ -12,15 +14,20 @@ public class ResourceSpawner : PoolSpawner<Resource>
     private List<Vector3> _availableSpawpoints = new List<Vector3>();
     private Hub<Resource> _hub = new Hub<Resource>();
 
-    private Coroutine _spawnCoroutine;
+    private CancellationTokenSource _cancellationTokenSource;
 
     public Hub<Resource> Hub => _hub;
 
-    private void Start()
+    private void OnEnable()
     {
         _availableSpawpoints = _spawnpointsContainer.Spawnpoints;
 
-        _spawnCoroutine = StartCoroutine(SpawnCoroutine());
+        StartSpawn();
+    }
+
+    private void OnDisable()
+    {
+        StopSpawn();
     }
 
     public override Resource Spawn()
@@ -46,13 +53,29 @@ public class ResourceSpawner : PoolSpawner<Resource>
         objectToRelease.ReleaseTimeCome -= Release;
     }
 
-    private IEnumerator SpawnCoroutine()
+    private void StartSpawn()
     {
-        var wait = new WaitForSeconds(_spawnDelay);
+        if (_cancellationTokenSource != null)
+            return;
 
-        while (enabled)
+        _cancellationTokenSource = new CancellationTokenSource();
+        StartSpawnAsync().Forget();
+    }
+
+    private void StopSpawn()
+    {
+        _cancellationTokenSource.Cancel();
+        _cancellationTokenSource.Dispose();
+
+        _cancellationTokenSource = null;
+    }
+
+    private async UniTaskVoid StartSpawnAsync()
+    {
+        while (_cancellationTokenSource.IsCancellationRequested == false)
         {
-            yield return wait;
+            await UniTask.Delay(TimeSpan.FromSeconds(_spawnDelay), cancellationToken: _cancellationTokenSource.Token);
+
             Spawn();
         }
     }

@@ -7,6 +7,8 @@ public abstract class Spawner<T> : MonoBehaviour where T : MonoBehaviour
 
     public virtual T Spawn()
     {
-        return Instantiate(Prefab, ParentContainer);
+        T spawned = Instantiate(Prefab, ParentContainer);
+
+        return spawned;
     }
 }

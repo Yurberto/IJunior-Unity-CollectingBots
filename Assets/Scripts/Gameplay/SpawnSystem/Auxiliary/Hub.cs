@@ -4,27 +4,24 @@ using UnityEngine;
 public class Hub<T> where T : MonoBehaviour
 {
     private List<T> _availableObjects = new List<T>();
-    private HashSet<T> _busyObjects = new HashSet<T>();
+
+    public bool HasAvailable => _availableObjects.Count > 0;
 
     public void Add(T @object)
     {
+        if (_availableObjects.Contains(@object))
+            return;
+
         _availableObjects.Add(@object);
     }
 
-    public bool TryGetAvailable(out T available)
+    public T GetAvailable()
     {
-        if (_availableObjects.Count == 0)
-        {
-            available = null;
-            return false;
-        }
+        int randomIndex = Random.Range(0, _availableObjects.Count);
+        T available = _availableObjects[randomIndex];
 
-        int randomindex = Random.Range(0, _availableObjects.Count);
-        available = _availableObjects[randomindex];
+        _availableObjects.RemoveAt(randomIndex);
 
-        _availableObjects.RemoveAt(randomindex);
-        _busyObjects.Add(available);
-
-        return true;
+        return available;
     }
 }

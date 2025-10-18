@@ -1,5 +1,7 @@
+using Cysharp.Threading.Tasks;
 using System;
 using System.Collections;
+using System.Threading;
 using UnityEngine;
 
 [RequireComponent(typeof(Collider))]
@@ -16,6 +18,8 @@ public class Robot : MonoBehaviour
 
     private Vector3 _startPosition;
     private bool _isWork = false;
+
+    private CancellationTokenSource _cancellationTokenSource;
 
     public event Action<Resource> ResourceDelivered;
 
@@ -36,6 +40,17 @@ public class Robot : MonoBehaviour
     private void Start()
     {
         GetComponent<Collider>().isTrigger = true;
+        _cancellationTokenSource = new CancellationTokenSource();
+    }
+
+    private void OnDisable()
+    {
+        if (_cancellationTokenSource == null)
+            return;
+
+        _cancellationTokenSource.Cancel();
+        _cancellationTokenSource.Dispose();
+        _cancellationTokenSource = null;
     }
 
     public void GoPickUp(Resource target)
@@ -44,12 +59,12 @@ public class Robot : MonoBehaviour
         _currentResource = target;
         _mover.MoveTo(target.transform.position);
 
-        StartCoroutine(GoPickUpCoroutine());
+        PickUpAsync().Forget();
     }
 
-    private IEnumerator GoPickUpCoroutine()
+    private async UniTaskVoid PickUpAsync()
     {
-        yield return new WaitUntil(() => Vector3.Distance(transform.position, _currentResource.transform.position) < _reachedDistance);
+        await UniTask.WaitUntil(() => IsOnPosiotion(_currentResource.SpawnPosition), cancellationToken: _cancellationTokenSource.Token);
 
         _resourceDeliverer.PickUp(_currentResource);
         BackToBase();
@@ -59,13 +74,13 @@ public class Robot : MonoBehaviour
     {
         _resourceDeliverer.PickUp(_currentResource);
         _mover.MoveTo(_startPosition);
-
-        StartCoroutine(PutInOnBase());
+        
+        PutInOnBase().Forget();
     }
 
-    private IEnumerator PutInOnBase()
+    private async UniTaskVoid PutInOnBase()
     {
-        yield return new WaitUntil(() => Vector3.Distance(transform.position, _startPosition) < _reachedDistance);
+        await UniTask.WaitUntil(() => IsOnPosiotion(_startPosition), cancellationToken: _cancellationTokenSource.Token);
 
         PutIn();
         _mover.Stop();
@@ -78,5 +93,13 @@ public class Robot : MonoBehaviour
 
         _currentResource = null;
         _isWork = false;
+    }
+
+    private bool IsOnPosiotion(Vector3 position)
+    {
+        Vector2 position2D = new Vector2(position.x, position.z);
+        Vector2 transformPosition2D = new Vector2(transform.position.x, transform.position.z);
+
+        return Vector3.Distance(transformPosition2D, position2D) < _reachedDistance;
     }
 }
