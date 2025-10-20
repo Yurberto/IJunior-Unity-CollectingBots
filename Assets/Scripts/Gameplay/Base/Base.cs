@@ -7,7 +7,7 @@ using UnityEngine;
 public class Base : MonoBehaviour
 {
     [SerializeField] private SpawnpointContainer _robotSpawnpointContainer;
-    [SerializeField, Range(0.0f, 10.0f)] private float _workDelay = 3f;
+    [SerializeField, Range(0.0f, 10.0f)] private float _workDelay = 0.5f;
 
     private List<Robot> _robots = new List<Robot>();    
     private ResourceMonitor _resourceMonitor = new ResourceMonitor();
@@ -34,9 +34,6 @@ public class Base : MonoBehaviour
 
     private void Start()
     {
-        CreateRobot();
-        CreateRobot();
-        CreateRobot();
         CreateRobot();
     }
 
