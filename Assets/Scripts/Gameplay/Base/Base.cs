@@ -51,6 +51,11 @@ public class Base : MonoBehaviour
     {
         StopWork();
 
+        for (int i = 0; i < _robots.Count; i++)
+        {
+            _robots[i].ResourceDelivered -= OnResourceDelivered;
+        }
+
         _resourceMonitor.CountChanged -= OnResourceCountChanged;
     }
 
@@ -67,7 +72,6 @@ public class Base : MonoBehaviour
                 if (_resourceHub.HasAvailable)
                 {
                     robot.GoPickUp(_resourceHub.GetAvailable());
-                    robot.ResourceDelivered += OnResourceDelivered;
                 }
             }
         }
@@ -85,6 +89,8 @@ public class Base : MonoBehaviour
         Robot spawned = _robotSpawner.Spawn();
         spawned.Initialize(SpawnUtils.GetSpawnPosition(_availableRobotSpawnpoints));
         _robots.Add(spawned);
+        
+        spawned.ResourceDelivered += OnResourceDelivered;
     }
 
     private bool TryGetRobot(out Robot robot)
@@ -104,11 +110,9 @@ public class Base : MonoBehaviour
 
     private void OnResourceDelivered(Robot deliveryRobot, Resource resource)
     {
-        deliveryRobot.ResourceDelivered -= OnResourceDelivered;
-
+        resource.InvokeRelease();
         _resourceHub.Remove(resource);
         _resourceMonitor.AddResource();
-        resource.InvokeRelease();
     }
 
     private void OnResourceCountChanged(int value)

@@ -88,6 +88,7 @@ public class Robot : MonoBehaviour
     {
         _isWork = false;
         ResourceDelivered?.Invoke(this, _currentResource);
+        Debug.Log("REsourceDelivered");
 
         _currentResource = null;
     }
