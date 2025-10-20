@@ -62,13 +62,13 @@ public class ResourceScanner : MonoBehaviour
     private void Scan()
     {
         int hittedCount = Physics.OverlapBoxNonAlloc(transform.position, _scanSize, _scanned, Quaternion.identity, LayerData.Resource);
-        DebugDrawUtils.DrawBox(transform.position, _scanSize, Color.red, 1);
+        DebugDrawUtils.DrawBox(transform.position, _scanSize, Color.red, 0.3f);
 
         for (int i = 0; i < hittedCount; i++)
         {
             if (_scanned[i].TryGetComponent(out Resource resource))
 
-            _resourceHub.SetAvailable(resource);
+            _resourceHub.Add(resource);
         }
     }
 }

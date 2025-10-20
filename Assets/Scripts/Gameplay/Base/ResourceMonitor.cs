@@ -7,10 +7,7 @@ public class ResourceMonitor
 
     public int Count
         {
-        get 
-        { 
-            return _count;
-        }
+        get => _count;
         private set
         {
             _count = value;

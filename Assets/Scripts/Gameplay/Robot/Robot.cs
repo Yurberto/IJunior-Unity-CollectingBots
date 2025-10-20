@@ -19,7 +19,7 @@ public class Robot : MonoBehaviour
 
     private CancellationTokenSource _cancellationTokenSource;
 
-    public event Action<Resource> ResourceDelivered;
+    public event Action<Robot, Resource> ResourceDelivered;
 
     public bool IsWork => _isWork;
 
@@ -86,10 +86,10 @@ public class Robot : MonoBehaviour
 
     private void PutIn()
     {
-        ResourceDelivered?.Invoke(_currentResource);
+        _isWork = false;
+        ResourceDelivered?.Invoke(this, _currentResource);
 
         _currentResource = null;
-        _isWork = false;
     }
 
     private bool IsOnPosiotion(Vector3 position)

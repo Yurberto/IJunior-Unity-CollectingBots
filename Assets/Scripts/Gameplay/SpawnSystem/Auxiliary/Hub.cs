@@ -27,11 +27,8 @@ public class Hub<T> where T : MonoBehaviour
         return available;
     }
 
-    public void SetAvailable(T @object)
+    public void Remove(T @object)
     {
-        if (_busyObjects.Remove(@object))
-        {
-            _availableObjects.Add(@object);
-        }
+        _busyObjects.Remove(@object);
     }
 }
