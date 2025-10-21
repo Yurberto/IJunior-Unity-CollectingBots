@@ -1,43 +1,62 @@
 using System;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 
 public class ResourceMonitor
 {
     private int _maxCount;
-    private int _count;
+    private float _checkDelay;
 
-    public int Count
-        {
-        get => _count;
-        private set
-        {
-            _count = value;
-            CountChanged?.Invoke(_count); 
-        }
-    }
+    private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
 
-    public event Action<int> CountChanged;
+    public event Action CreateRobotAvailable;
 
-    public ResourceMonitor(int count = 0, int maxCount = 1000)
+    public ReactiveProperty<int> Count { get; private set; } = new();
+
+    public ResourceMonitor(float checkMoneyAmountDelay = 0.5f, int count = 0, int maxCount = 1000)
     {
-        _count = count;
+        _checkDelay = checkMoneyAmountDelay;
+        Count.Value = count;
         _maxCount = maxCount;
     }
 
     public void AddResource()
     {
-        if (Count >= _maxCount)
+        if (Count.Value >= _maxCount)
             return;
 
-        Count++;
+        Count.Value++;
     }
 
     public bool TrySpend(int cost)
     {
-        if (cost < 0 || cost > Count) 
+        if (cost < 0 || cost > Count.Value)
             return false;
 
-        Count -= cost;
+        Count.Value -= cost;
 
         return true;
+    }
+
+    public async UniTaskVoid CheckMoneyAmountAsync()
+    {
+        while (_cancellationTokenSource.IsCancellationRequested == false)
+        {
+            await UniTask.Delay(TimeSpan.FromSeconds(_checkDelay), cancellationToken: _cancellationTokenSource.Token);
+            CheckMoneyAmount();
+        }
+    }
+
+    public void StopCheckMoneyAmount()
+    {
+        _cancellationTokenSource.Cancel();
+        _cancellationTokenSource?.Dispose();
+        _cancellationTokenSource = null;
+    }
+
+    private void CheckMoneyAmount()
+    {
+        if (Count.Value - CreateCostData.RobotCost >= 0)
+            CreateRobotAvailable?.Invoke();
     }
 }

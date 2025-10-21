@@ -15,9 +15,4 @@ public class ReactiveProperty<T>
             Changed?.Invoke(value);
         }
     }
-
-    public ReactiveProperty(T value)
-    {
-        _value = value;
-    }
 }

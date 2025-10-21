@@ -15,13 +15,10 @@ public class Robot : MonoBehaviour
     private Resource _currentResource;
 
     private Vector3 _startPosition;
-    private bool _isWork = false;
 
     private CancellationTokenSource _cancellationTokenSource;
 
     public event Action<Robot, Resource> ResourceDelivered;
-
-    public bool IsWork => _isWork;
 
     public void Initialize(Vector3 startPosition)
     {
@@ -52,7 +49,6 @@ public class Robot : MonoBehaviour
 
     public void GoPickUp(Resource target)
     {
-        _isWork = true;
         _currentResource = target;
         _mover.MoveTo(target.transform.position);
 
@@ -86,11 +82,11 @@ public class Robot : MonoBehaviour
 
     private void PutIn()
     {
-        _isWork = false;
         ResourceDelivered?.Invoke(this, _currentResource);
-        Debug.Log("REsourceDelivered");
-
         _currentResource = null;
+
+        transform.rotation = Quaternion.identity;
+        transform.position = _startPosition;
     }
 
     private bool IsOnPosiotion(Vector3 position)

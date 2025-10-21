@@ -7,53 +7,63 @@ using UnityEngine;
 public class Base : MonoBehaviour
 {
     [SerializeField] private SpawnpointContainer _robotSpawnpointContainer;
-    [SerializeField, Range(0.0f, 10.0f)] private float _workDelay = 0.5f;
+    [SerializeField, Range(0.0f, 10.0f)] private float _workDelay = 0.5f;   
+    [SerializeField, Range(0.0f, 10.0f)] private float _checkMoneyAmountDelay = 0.5f;
 
-    private List<Robot> _robots = new List<Robot>();    
-    private ResourceMonitor _resourceMonitor = new ResourceMonitor();
+    private List<Robot> _robots = new List<Robot>();
+    private ResourceMonitor _resourceMonitor;
 
     private RobotSpawner _robotSpawner;
-    private List<Vector3> _availableRobotSpawnpoints;
+    private Hub<Resource> _availableResources;
 
-    private Hub<Resource> _resourceHub;
+    private Hub<Robot> _availableRobots;
+    private Hub<Vector3> _availableRobotSpawnpoints;
 
     private CancellationTokenSource _cancellationTokenSource;
 
     public event Action<int> ResourceValueChanged;
 
-    public void Initialize(RobotSpawner robotSpawner, Hub<Resource> resourceHub)
+    public void Initialize(RobotSpawner robotSpawner, Hub<Resource> availableResources)
     {
         _robotSpawner = robotSpawner;
-        _resourceHub = resourceHub;
+        _availableResources = availableResources;
     }
 
     private void Awake()
     {
-        _availableRobotSpawnpoints = _robotSpawnpointContainer.Spawnpoints;
+        _availableRobots = new Hub<Robot>();
+        _availableRobotSpawnpoints = new Hub<Vector3>(_robotSpawnpointContainer.Spawnpoints);
+
+        _resourceMonitor = new ResourceMonitor(_checkMoneyAmountDelay);
     }
 
     private void Start()
     {
+        _resourceMonitor.AddResource();
+        _resourceMonitor.AddResource();
+        _resourceMonitor.AddResource();
         CreateRobot();
     }
 
     private void OnEnable()
     {
         StartWork().Forget();
+        _resourceMonitor.CheckMoneyAmountAsync().Forget();
 
-        _resourceMonitor.CountChanged += OnResourceCountChanged;
+        _resourceMonitor.CreateRobotAvailable += CreateRobot;
+        _resourceMonitor.Count.Changed += OnResourceCountChanged;
     }
 
     private void OnDisable()
     {
         StopWork();
+        _resourceMonitor.StopCheckMoneyAmount();
 
         for (int i = 0; i < _robots.Count; i++)
-        {
             _robots[i].ResourceDelivered -= OnResourceDelivered;
-        }
 
-        _resourceMonitor.CountChanged -= OnResourceCountChanged;
+        _resourceMonitor.CreateRobotAvailable -= CreateRobot;
+        _resourceMonitor.Count.Changed -= OnResourceCountChanged;
     }
 
     private async UniTaskVoid StartWork()
@@ -64,13 +74,13 @@ public class Base : MonoBehaviour
         {
             await UniTask.Delay(TimeSpan.FromSeconds(_workDelay), cancellationToken: _cancellationTokenSource.Token);
 
-            if (TryGetRobot(out Robot robot))
-            {
-                if (_resourceHub.HasAvailable)
-                {
-                    robot.GoPickUp(_resourceHub.GetAvailable());
-                }
-            }
+            if (_availableRobots.IsEmpty ||  _availableResources.IsEmpty)
+                continue;
+
+            Robot robot = _availableRobots.GetRandom();
+            Resource resource = _availableResources.GetRandom();
+
+            robot.GoPickUp(resource);
         }
     }
 
@@ -83,32 +93,26 @@ public class Base : MonoBehaviour
 
     private void CreateRobot()
     {
+        if (_availableRobotSpawnpoints.IsEmpty)
+            return;
+
+        if (_resourceMonitor.TrySpend(CreateCostData.RobotCost) == false)
+            return;
+
         Robot spawned = _robotSpawner.Spawn();
-        spawned.Initialize(SpawnUtils.GetSpawnPosition(_availableRobotSpawnpoints));
+        spawned.Initialize(_availableRobotSpawnpoints.GetRandom());
+
         _robots.Add(spawned);
+        _availableRobots.Add(spawned);
         
         spawned.ResourceDelivered += OnResourceDelivered;
     }
 
-    private bool TryGetRobot(out Robot robot)
-    {
-        for (int i = 0; i < _robots.Count; i++)
-        {
-            if (_robots[i].IsWork == false)
-            {
-                robot = _robots[i];
-                return true;
-            }
-        }
-
-        robot = null;
-        return false;
-    }
-
     private void OnResourceDelivered(Robot deliveryRobot, Resource resource)
     {
+        _availableRobots.Add(deliveryRobot);
+
         resource.InvokeRelease();
-        _resourceHub.Remove(resource);
         _resourceMonitor.AddResource();
     }
 

@@ -1,6 +1,5 @@
 using Cysharp.Threading.Tasks;
 using System;
-using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
 
@@ -11,36 +10,38 @@ public class ResourceSpawner : PoolSpawner<Resource>
     [Space]
     [SerializeField, Range(0.0f, 50.0f)] private float _spawnDelay = 1.0f;
 
-    private List<Vector3> _availableSpawpoints = new List<Vector3>();
-    private Hub<Resource> _hub = new Hub<Resource>();
+    private Hub<Resource> _availableResources = new Hub<Resource>();
+    private Hub<Vector3> _availableSpawpoints;
 
     private CancellationTokenSource _cancellationTokenSource;
 
-    public Hub<Resource> Hub => _hub;
+    public Hub<Resource> AvailableResources => _availableResources;
+
+    protected override void Awake()
+    {
+        base.Awake();
+
+        _availableSpawpoints = new Hub<Vector3>(_spawnpointsContainer.Spawnpoints);
+    }
 
     private void OnEnable()
     {
-        _availableSpawpoints = _spawnpointsContainer.Spawnpoints;
-
         StartSpawn();
-
-        ObjectInstantiated += _hub.Add;
     }
 
     private void OnDisable()
     {
         StopSpawn();
-
-        ObjectInstantiated -= _hub.Add;
     }
 
     public override Resource Spawn()
     {
-        if (_availableSpawpoints.Count == 0)
+        if (_availableSpawpoints.IsEmpty)
             return null;
 
         Resource spawned = base.Spawn();
-        spawned.Initialize(SpawnUtils.GetSpawnPosition(_availableSpawpoints));
+        spawned.Initialize(_availableSpawpoints.GetRandom());
+        _availableResources.Add(spawned);
 
         spawned.ReleaseTimeCome += Release;
 
