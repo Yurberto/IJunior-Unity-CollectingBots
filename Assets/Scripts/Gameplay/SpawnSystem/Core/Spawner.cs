@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 public abstract class Spawner<T> : MonoBehaviour where T : MonoBehaviour
