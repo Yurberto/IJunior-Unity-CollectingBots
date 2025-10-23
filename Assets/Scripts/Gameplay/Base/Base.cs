@@ -7,7 +7,7 @@ using Zenject;
 
 public class Base : MonoBehaviour
 {
-    [SerializeField] private SpawnpointContainer _robotSpawnpointContainer;
+    [SerializeField] private Transform _robotSpawnpointContainer;
 
     [SerializeField, Range(0.0f, 10.0f)] private float _workDelay = 0.5f;   
     [SerializeField, Range(0.0f, 10.0f)] private float _checkMoneyAmountDelay = 0.5f;
@@ -23,28 +23,19 @@ public class Base : MonoBehaviour
 
     private CancellationTokenSource _cancellationTokenSource;
 
-    public event Action<int> ResourceValueChanged;
-
-    [Inject]
-    public void Construct(RobotSpawner robotSpawner, Hub<Resource> availableResources)
+    public void Initialize(Robot startRobot, RobotSpawner robotSpawner, Hub<Resource> availableResources)
     {
+        InitStartRobot(startRobot);
         _robotSpawner = robotSpawner;
         _availableResources = availableResources;
     }
 
     private void Awake()
     {
-        _availableRobotSpawnpoints.Fill(_robotSpawnpointContainer.Spawnpoints);
+        for (int i = 0; i < _robotSpawnpointContainer.childCount; i++)
+            _availableRobotSpawnpoints.Add(_robotSpawnpointContainer.GetChild(i).position);
 
         _resourceMonitor = new ResourceMonitor(_checkMoneyAmountDelay);
-    }
-
-    private void Start()
-    {
-        _resourceMonitor.AddResource();
-        _resourceMonitor.AddResource();
-        _resourceMonitor.AddResource();
-        SpawnRobot();
     }
 
     private void OnEnable()
@@ -53,7 +44,6 @@ public class Base : MonoBehaviour
         _resourceMonitor.CheckMoneyAmountAsync().Forget();
 
         _resourceMonitor.CreateRobotAvailable += SpawnRobot;
-        _resourceMonitor.Count.Changed += OnResourceCountChanged;
     }
 
     private void OnDisable()
@@ -65,7 +55,6 @@ public class Base : MonoBehaviour
             _robots[i].ResourceDelivered -= OnResourceDelivered;
 
         _resourceMonitor.CreateRobotAvailable -= SpawnRobot;
-        _resourceMonitor.Count.Changed -= OnResourceCountChanged;
     }
 
     private async UniTaskVoid StartWork()
@@ -93,6 +82,14 @@ public class Base : MonoBehaviour
         _cancellationTokenSource = null;
     }
 
+    private void InitStartRobot(Robot robot)
+    {
+        robot.Initialize(_availableRobotSpawnpoints.GetRandom());
+        robot.ResourceDelivered += OnResourceDelivered;
+        _robots.Add(robot);
+        _availableRobots.Add(robot);
+    }
+
     private void SpawnRobot()
     {
         if (_availableRobotSpawnpoints.IsEmpty)
@@ -116,10 +113,5 @@ public class Base : MonoBehaviour
 
         resource.InvokeRelease();
         _resourceMonitor.AddResource();
-    }
-
-    private void OnResourceCountChanged(int value)
-    {
-        ResourceValueChanged?.Invoke(value);
     }
 }

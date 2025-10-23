@@ -48,7 +48,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Prefab: {fileID: 3528135791703170908, guid: 53b3d18f18b6c5749aeb113d043f4e4d, type: 3}
   ParentContainer: {fileID: 3086302912871902486}
-  _spawnpointsContainer: {fileID: 3066061005380982881}
+  _spawnpointsContainer: {fileID: 5648522133805019015}
   _spawnDelay: 0.7
 --- !u!1 &646822193939553084
 GameObject:
@@ -215,7 +215,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3086302912871902486}
   m_Layer: 0
-  m_Name: Container
+  m_Name: ParentContainer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -276,7 +276,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5648522133805019015}
-  - component: {fileID: 3066061005380982881}
   m_Layer: 0
   m_Name: ResourceSpawnpoints
   m_TagString: Untagged
@@ -307,18 +306,6 @@ Transform:
   - {fileID: 5742373293149403589}
   m_Father: {fileID: 861647013158280322}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &3066061005380982881
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7848550328304204116}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cb20717eaec30e348b53b131662b8d16, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &8258320556922654543
 GameObject:
   m_ObjectHideFlags: 0

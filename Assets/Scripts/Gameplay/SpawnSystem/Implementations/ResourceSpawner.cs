@@ -6,12 +6,12 @@ using UnityEngine;
 public class ResourceSpawner : PoolSpawner<Resource>
 {
     [Space(16)]
-    [SerializeField] private SpawnpointContainer _spawnpointsContainer;
+    [SerializeField] private Transform _spawnpointsContainer;
     [Space]
     [SerializeField, Range(0.0f, 50.0f)] private float _spawnDelay = 1.0f;
 
     private Hub<Resource> _availableResources = new Hub<Resource>();
-    private Hub<Vector3> _availableSpawpoints = new Hub<Vector3>();
+    private Hub<Vector3> _availableSpawnpoints = new Hub<Vector3>();
 
     private CancellationTokenSource _cancellationTokenSource;
 
@@ -21,7 +21,8 @@ public class ResourceSpawner : PoolSpawner<Resource>
     {
         base.Awake();
 
-        _availableSpawpoints.Fill(_spawnpointsContainer.Spawnpoints);
+        for (int i = 0; i < _spawnpointsContainer.childCount; i++)
+            _availableSpawnpoints.Add(_spawnpointsContainer.GetChild(i).position);
     }
 
     private void OnEnable()
@@ -36,11 +37,11 @@ public class ResourceSpawner : PoolSpawner<Resource>
 
     public override Resource Spawn()
     {
-        if (_availableSpawpoints.IsEmpty)
+        if (_availableSpawnpoints.IsEmpty)
             return null;
 
         Resource spawned = base.Spawn();
-        spawned.Initialize(_availableSpawpoints.GetRandom());
+        spawned.Initialize(_availableSpawnpoints.GetRandom());
         _availableResources.Add(spawned);
 
         spawned.ReleaseTimeCome += Release;
@@ -52,7 +53,7 @@ public class ResourceSpawner : PoolSpawner<Resource>
     {
         base.Release(objectToRelease);
         objectToRelease.transform.parent = ParentContainer;
-        _availableSpawpoints.Add(objectToRelease.SpawnPosition);
+        _availableSpawnpoints.Add(objectToRelease.SpawnPosition);
 
         objectToRelease.ReleaseTimeCome -= Release;
     }

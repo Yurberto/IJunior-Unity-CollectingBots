@@ -10,6 +10,7 @@ public class Hub<T>
 
     public void Fill(List<T> other)
     {
+        Debug.Log(other.Count + " " + typeof(T));
         for (int i = 0; i < other.Count; i++)
             _objects.Add(other[i]);
     }
@@ -25,7 +26,7 @@ public class Hub<T>
     public T GetRandom()
     {
         if (_objects == null || _objects.Count == 0)
-            return default(T);
+            throw new System.Exception(null);
 
         int randomIndex = Random.Range(0, _objects.Count);
         T randomObject = _objects[randomIndex];

@@ -305,7 +305,7 @@ Transform:
   m_GameObject: {fileID: 3164082729226960150}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -38}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -325,8 +325,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 83e6f966478edbe4abe1f8cc825ce558, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _robotSpawnpointContainer: {fileID: 4696559320497736510}
-  _workDelay: 3
+  _robotSpawnpointContainer: {fileID: 8167528795427943688}
+  _workDelay: 0.2
   _checkMoneyAmountDelay: 0.5
 --- !u!1 &3298247040545734730
 GameObject:
@@ -523,9 +523,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8167528795427943688}
-  - component: {fileID: 4696559320497736510}
   m_Layer: 0
-  m_Name: BaseSpawnpoints
+  m_Name: RobotSpawnpoints
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -562,18 +561,6 @@ Transform:
   - {fileID: 7027542699629670195}
   m_Father: {fileID: 1621964553477780910}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &4696559320497736510
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6833086391507492271}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cb20717eaec30e348b53b131662b8d16, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &6983434665096874627
 GameObject:
   m_ObjectHideFlags: 0
