@@ -11,7 +11,7 @@ public class ResourceSpawner : PoolSpawner<Resource>
     [SerializeField, Range(0.0f, 50.0f)] private float _spawnDelay = 1.0f;
 
     private Hub<Resource> _availableResources = new Hub<Resource>();
-    private Hub<Vector3> _availableSpawpoints;
+    private Hub<Vector3> _availableSpawpoints = new Hub<Vector3>();
 
     private CancellationTokenSource _cancellationTokenSource;
 
@@ -21,7 +21,7 @@ public class ResourceSpawner : PoolSpawner<Resource>
     {
         base.Awake();
 
-        _availableSpawpoints = new Hub<Vector3>(_spawnpointsContainer.Spawnpoints);
+        _availableSpawpoints.Fill(_spawnpointsContainer.Spawnpoints);
     }
 
     private void OnEnable()

@@ -5,14 +5,14 @@ public class Hub<T>
 {
     private List<T> _objects = new List<T>();
 
-    public Hub(List<T> other)
+    public bool IsEmpty => _objects.Count == 0;
+    public int Count => _objects.Count;
+
+    public void Fill(List<T> other)
     {
         for (int i = 0; i < other.Count; i++)
             _objects.Add(other[i]);
     }
-
-    public bool IsEmpty => _objects.Count == 0;
-    public int Count => _objects.Count;
 
     public void Add(T @object)
     {

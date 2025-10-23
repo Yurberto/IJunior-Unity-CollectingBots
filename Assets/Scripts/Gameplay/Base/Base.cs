@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
+using Zenject;
 
 public class Base : MonoBehaviour
 {
@@ -17,14 +18,15 @@ public class Base : MonoBehaviour
     private RobotSpawner _robotSpawner;
     private Hub<Resource> _availableResources;
 
-    private Hub<Robot> _availableRobots;
-    private Hub<Vector3> _availableRobotSpawnpoints;
+    private Hub<Robot> _availableRobots = new Hub<Robot>();
+    private Hub<Vector3> _availableRobotSpawnpoints = new Hub<Vector3>();
 
     private CancellationTokenSource _cancellationTokenSource;
 
     public event Action<int> ResourceValueChanged;
 
-    public void Initialize(RobotSpawner robotSpawner, Hub<Resource> availableResources)
+    [Inject]
+    public void Construct(RobotSpawner robotSpawner, Hub<Resource> availableResources)
     {
         _robotSpawner = robotSpawner;
         _availableResources = availableResources;
@@ -32,8 +34,7 @@ public class Base : MonoBehaviour
 
     private void Awake()
     {
-        _availableRobots = new Hub<Robot>(_robots);
-        _availableRobotSpawnpoints = new Hub<Vector3>(_robotSpawnpointContainer.Spawnpoints);
+        _availableRobotSpawnpoints.Fill(_robotSpawnpointContainer.Spawnpoints);
 
         _resourceMonitor = new ResourceMonitor(_checkMoneyAmountDelay);
     }

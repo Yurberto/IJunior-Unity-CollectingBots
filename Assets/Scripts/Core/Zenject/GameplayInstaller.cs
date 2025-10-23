@@ -8,7 +8,7 @@ public class GameplayInstaller : MonoInstaller
 
     public override void InstallBindings()
     {
-        Container.Bind<ResourceSpawner>().AsSingle();
-        Container.Bind<RobotSpawner>().AsSingle();
+        Container.Bind<Hub<Resource>>().FromInstance(_resourceSpawner.AvailableResources).AsSingle();
+        Container.Bind<RobotSpawner>().FromInstance(_robotSpawner).AsSingle();
     }
 }

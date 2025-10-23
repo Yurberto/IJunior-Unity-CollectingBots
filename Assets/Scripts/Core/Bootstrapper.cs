@@ -3,14 +3,7 @@ using UnityEngine;
 public class Bootstrapper : MonoBehaviour
 {
     [SerializeField] private Base _base;
-    [SerializeField] private RobotSpawner _robotSpawner;
-    [SerializeField] private ResourceSpawner _resourceSpawner;
     [SerializeField] private ResourceViewer _resourceViewer;
-
-    private void Awake()
-    {
-        _base.Initialize(_robotSpawner, _resourceSpawner.AvailableResources);
-    }
 
     private void OnEnable()
     {
