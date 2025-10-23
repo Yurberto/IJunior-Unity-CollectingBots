@@ -3,23 +3,21 @@ using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
-using Zenject;
 
 public class Base : MonoBehaviour
 {
     [SerializeField] private Transform _robotSpawnpointContainer;
 
     [SerializeField, Range(0.0f, 10.0f)] private float _workDelay = 0.5f;   
-    [SerializeField, Range(0.0f, 10.0f)] private float _checkMoneyAmountDelay = 0.5f;
 
-    private List<Robot> _robots = new List<Robot>();
-    private ResourceMonitor _resourceMonitor;
+    private ResourceMonitor _resourceMonitor = new();
+
+    private List<Robot> _robots = new();
+    private Hub<Robot> _availableRobots = new();
+    private Hub<Vector3> _availableRobotSpawnpoints = new();
 
     private RobotSpawner _robotSpawner;
     private Hub<Resource> _availableResources;
-
-    private Hub<Robot> _availableRobots = new Hub<Robot>();
-    private Hub<Vector3> _availableRobotSpawnpoints = new Hub<Vector3>();
 
     private CancellationTokenSource _cancellationTokenSource;
 
@@ -34,8 +32,6 @@ public class Base : MonoBehaviour
     {
         for (int i = 0; i < _robotSpawnpointContainer.childCount; i++)
             _availableRobotSpawnpoints.Add(_robotSpawnpointContainer.GetChild(i).position);
-
-        _resourceMonitor = new ResourceMonitor(_checkMoneyAmountDelay);
     }
 
     private void OnEnable()
@@ -97,7 +93,6 @@ public class Base : MonoBehaviour
 
         if (_resourceMonitor.TrySpend(CreateCostData.RobotCost) == false)
             return;
-
         Robot spawned = _robotSpawner.Spawn();
         spawned.Initialize(_availableRobotSpawnpoints.GetRandom());
 

@@ -16,5 +16,7 @@ public class GameplayInstaller : MonoInstaller
         Container.Bind<BaseSpawner>().FromInstance(_baseSpawner).AsSingle();
         Container.Bind<Robot>().FromInstance(_robot).AsSingle();
         Container.Bind<ResourceViewer>().FromInstance(_resourceViewer).AsSingle();
+
+        Container.BindInterfacesAndSelfTo<InputReader>().AsSingle();
     }
 }
