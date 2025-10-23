@@ -5,8 +5,6 @@ public class Hub<T>
 {
     private List<T> _objects = new List<T>();
 
-    public Hub() { }
-
     public Hub(List<T> other)
     {
         for (int i = 0; i < other.Count; i++)

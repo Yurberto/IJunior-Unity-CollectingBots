@@ -32,7 +32,7 @@ public class Base : MonoBehaviour
 
     private void Awake()
     {
-        _availableRobots = new Hub<Robot>();
+        _availableRobots = new Hub<Robot>(_robots);
         _availableRobotSpawnpoints = new Hub<Vector3>(_robotSpawnpointContainer.Spawnpoints);
 
         _resourceMonitor = new ResourceMonitor(_checkMoneyAmountDelay);
