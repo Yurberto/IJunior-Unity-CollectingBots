@@ -43,7 +43,7 @@ public class Base : MonoBehaviour
         _resourceMonitor.AddResource();
         _resourceMonitor.AddResource();
         _resourceMonitor.AddResource();
-        CreateRobot();
+        SpawnRobot();
     }
 
     private void OnEnable()
@@ -51,7 +51,7 @@ public class Base : MonoBehaviour
         StartWork().Forget();
         _resourceMonitor.CheckMoneyAmountAsync().Forget();
 
-        _resourceMonitor.CreateRobotAvailable += CreateRobot;
+        _resourceMonitor.CreateRobotAvailable += SpawnRobot;
         _resourceMonitor.Count.Changed += OnResourceCountChanged;
     }
 
@@ -63,7 +63,7 @@ public class Base : MonoBehaviour
         for (int i = 0; i < _robots.Count; i++)
             _robots[i].ResourceDelivered -= OnResourceDelivered;
 
-        _resourceMonitor.CreateRobotAvailable -= CreateRobot;
+        _resourceMonitor.CreateRobotAvailable -= SpawnRobot;
         _resourceMonitor.Count.Changed -= OnResourceCountChanged;
     }
 
@@ -92,7 +92,7 @@ public class Base : MonoBehaviour
         _cancellationTokenSource = null;
     }
 
-    private void CreateRobot()
+    private void SpawnRobot()
     {
         if (_availableRobotSpawnpoints.IsEmpty)
             return;
