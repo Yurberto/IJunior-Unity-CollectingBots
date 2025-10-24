@@ -1,13 +1,19 @@
 using UnityEngine;
 
-public abstract class Spawner<T> : MonoBehaviour where T : MonoBehaviour
+public class Spawner<T> where T : MonoBehaviour
 {
-    [SerializeField] protected T Prefab;
-    [SerializeField] protected Transform ParentContainer;
+    protected T Prefab;
+    protected Transform ParentContainer;
+
+    public Spawner(T prefab, Transform parentContainer)
+    {
+        Prefab = prefab;
+        ParentContainer = parentContainer;
+    }
 
     public virtual T Spawn()
     {
-        T spawned = Instantiate(Prefab, ParentContainer);
+        T spawned = Object.Instantiate(Prefab, ParentContainer);
 
         return spawned;
     }

@@ -4,6 +4,7 @@ public static class DebugDrawUtils
 {
     public static void DrawBox(Vector3 center, Vector3 size, Color color, float duration = 0f)
     {
+        Debug.Log("DRAW");
         Vector3 halfSize = size * 0.5f;
 
         DrawSquare(center + new Vector3(0, -halfSize.y, 0),

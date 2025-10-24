@@ -4,11 +4,17 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
+[RequireComponent(typeof(Collider))]
+[RequireComponent(typeof(FlagController))]
 public class Base : MonoBehaviour
 {
+    [SerializeField] private BaseRenderer _baseRenderer;
     [SerializeField] private Transform _robotSpawnpointContainer;
 
     [SerializeField, Range(0.0f, 10.0f)] private float _workDelay = 0.5f;   
+
+    private Collider _collider;
+    private FlagController _flagController;
 
     private ResourceMonitor _resourceMonitor = new();
 
@@ -16,12 +22,14 @@ public class Base : MonoBehaviour
     private Hub<Robot> _availableRobots = new();
     private Hub<Vector3> _availableRobotSpawnpoints = new();
 
-    private RobotSpawner _robotSpawner;
+    private RobotSpawnSystem _robotSpawner;
     private Hub<Resource> _availableResources;
 
     private CancellationTokenSource _cancellationTokenSource;
 
-    public void Initialize(Robot startRobot, RobotSpawner robotSpawner, Hub<Resource> availableResources)
+    public Vector3 Size => _collider.bounds.size;
+
+    public void Initialize(Robot startRobot, RobotSpawnSystem robotSpawner, Hub<Resource> availableResources)
     {
         InitStartRobot(startRobot);
         _robotSpawner = robotSpawner;
@@ -30,6 +38,10 @@ public class Base : MonoBehaviour
 
     private void Awake()
     {
+        _collider = GetComponent<Collider>();
+        _collider.isTrigger = true;
+        _flagController = GetComponent<FlagController>();
+
         for (int i = 0; i < _robotSpawnpointContainer.childCount; i++)
             _availableRobotSpawnpoints.Add(_robotSpawnpointContainer.GetChild(i).position);
     }
@@ -51,6 +63,16 @@ public class Base : MonoBehaviour
             _robots[i].ResourceDelivered -= OnResourceDelivered;
 
         _resourceMonitor.CreateRobotAvailable -= SpawnRobot;
+    }
+
+    public void SwitchState()
+    {
+        _baseRenderer.SwitchColor();
+    }
+
+    public void SetFlag(RaycastHit hit)
+    {
+        _flagController.PutOn(hit);
     }
 
     private async UniTaskVoid StartWork()

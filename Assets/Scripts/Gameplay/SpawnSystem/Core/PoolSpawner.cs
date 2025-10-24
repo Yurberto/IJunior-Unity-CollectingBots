@@ -1,10 +1,10 @@
 using UnityEngine;
 
-public abstract class PoolSpawner<T> : Spawner<T> where T : MonoBehaviour
+public class PoolSpawner<T> : Spawner<T> where T : MonoBehaviour
 {
     private GameObjectPool<T> _pool;
 
-    protected virtual void Awake()
+    public PoolSpawner(T prefab, Transform parentContainer) : base(prefab, parentContainer)
     {
         _pool = new GameObjectPool<T>(() => base.Spawn());
     }
@@ -14,8 +14,9 @@ public abstract class PoolSpawner<T> : Spawner<T> where T : MonoBehaviour
         return _pool.Get();
     }
 
-    protected virtual void Release(T objectToRelease)
+    public void Release(T objectToRelease)
     {
         _pool.Release(objectToRelease);
+        objectToRelease.transform.parent = ParentContainer;
     }
 }

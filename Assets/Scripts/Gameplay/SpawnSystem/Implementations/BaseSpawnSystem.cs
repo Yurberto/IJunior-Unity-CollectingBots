@@ -3,23 +3,31 @@ using Zenject;
 
 public class BaseSpawnSystem : MonoBehaviour
 {
+    [SerializeField] private Base _basePrefab;
+    [SerializeField] private Transform _baseContainer;
+
+    private Spawner<Base> _baseSpawner;
+
     private Robot _startRobot;
-    private BaseSpawner _baseSpawner;
-    private RobotSpawner _robotSpawner;
+    private RobotSpawnSystem _robotSpawner;
     private Hub<Resource> _availableResources;
 
     [Inject]
-    private void Construct(Robot startRobot, BaseSpawner baseSpawner, RobotSpawner robotSpawner, Hub<Resource> availableResources)
+    private void Construct(Robot startRobot, RobotSpawnSystem robotSpawner, Hub<Resource> availableResources)
     {
         _startRobot = startRobot;
-        _baseSpawner = baseSpawner;
         _robotSpawner = robotSpawner;
         _availableResources = availableResources;
     }
 
+    private void Awake()
+    {
+        _baseSpawner = new Spawner<Base>(_basePrefab, _baseContainer);
+    }
+
     private void Start()
     {
-        Spawn(_startRobot, _baseSpawner.transform.position);
+        Spawn(_startRobot, Vector3.zero);
     }
 
     public void Spawn(Robot startRobot, Vector3 spawnPosition)

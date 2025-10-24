@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8383625559489321439}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Spawnpoint (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -40,7 +40,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3066742783409472285}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Spawnpoint (4)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -71,7 +71,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3817556895716499982}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Spawnpoint (3)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -102,7 +102,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7027542699629670195}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Spawnpoint (4)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -133,7 +133,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 667696804288580922}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Spawnpoint (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -164,7 +164,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8126829635986681409}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Spawnpoint (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -195,7 +195,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6992037877615548775}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Spawnpoint (4)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -226,7 +226,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3566325827448353888}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Spawnpoint (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -257,7 +257,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2468911392573844565}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Spawnpoint (3)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -288,8 +288,11 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1621964553477780910}
+  - component: {fileID: 7043152083444386527}
+  - component: {fileID: 4937644557739341846}
   - component: {fileID: 2015611635109283774}
-  m_Layer: 0
+  - component: {fileID: 8532560561288435174}
+  m_Layer: 8
   m_Name: Base
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -313,6 +316,54 @@ Transform:
   - {fileID: 6636556091905784635}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &7043152083444386527
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3164082729226960150}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 15, y: 0.5, z: 15}
+  m_Center: {x: 0, y: 0.75, z: 0}
+--- !u!54 &4937644557739341846
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3164082729226960150}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 0
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 126
+  m_CollisionDetection: 0
 --- !u!114 &2015611635109283774
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -325,9 +376,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 83e6f966478edbe4abe1f8cc825ce558, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _baseRenderer: {fileID: 7867104203549947727}
   _robotSpawnpointContainer: {fileID: 8167528795427943688}
   _workDelay: 0.2
-  _checkMoneyAmountDelay: 0.5
+--- !u!114 &8532560561288435174
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3164082729226960150}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 59623d864d9b15c48aea13717a396e18, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _flagPrefab: {fileID: 1924130144875391247, guid: 32813af10183c1e4b9b77a6c9e66a113, type: 3}
+  _surfaceOffset: 1.5
 --- !u!1 &3298247040545734730
 GameObject:
   m_ObjectHideFlags: 0
@@ -337,7 +402,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 775768917026996662}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Spawnpoint (4)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -368,7 +433,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6056034420084920222}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Spawnpoint (3)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -399,7 +464,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8467597179697384036}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Spawnpoint (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -430,7 +495,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4317892569850406870}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Spawnpoint (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -461,7 +526,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4880945132589171658}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Spawnpoint (3)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -492,7 +557,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 9139191128074188256}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Spawnpoint (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -523,7 +588,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8167528795427943688}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: RobotSpawnpoints
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -572,9 +637,9 @@ GameObject:
   - component: {fileID: 6636556091905784635}
   - component: {fileID: 3747799645332976762}
   - component: {fileID: 2821337310090049257}
-  - component: {fileID: 9009015023187088208}
-  m_Layer: 0
-  m_Name: Plane
+  - component: {fileID: 7867104203549947727}
+  m_Layer: 8
+  m_Name: Renderer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -645,28 +710,20 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &9009015023187088208
-MeshCollider:
+--- !u!114 &7867104203549947727
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6983434665096874627}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: de591e34656095b49975e4206dbcfa77, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _defaultColor: {r: 1, g: 0.89008415, b: 0, a: 1}
+  _clickedColor: {r: 1, g: 0, b: 0, a: 1}
 --- !u!1 &7156939938556619299
 GameObject:
   m_ObjectHideFlags: 0
@@ -676,7 +733,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2944385800982846517}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Spawnpoint (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}

@@ -1,22 +1,24 @@
 using UnityEngine;
 using Zenject;
 
-public class GameplayInstaller : MonoInstaller
+public sealed class GameplayInstaller : MonoInstaller
 {
-    [SerializeField] private Robot _robot;
-    [SerializeField] private BaseSpawner _baseSpawner;
-    [SerializeField] private RobotSpawner _robotSpawner;
-    [SerializeField] private ResourceSpawnSystem _resourceSystem;
+    [SerializeField] private Robot _robotPrefab;
+    [Space(16)]
+    [SerializeField] private ResourceSpawnSystem _resourceSpawnSystem;
+    [SerializeField] private RobotSpawnSystem _robotSpawnSystem;
     [SerializeField] private ResourceViewer _resourceViewer;
+    [SerializeField] private CameraRaycaster _raycaster;
 
     public override void InstallBindings()
     {
-        Container.Bind<Hub<Resource>>().FromInstance(_resourceSystem.AvailableResources).AsSingle();
-        Container.Bind<RobotSpawner>().FromInstance(_robotSpawner).AsSingle();
-        Container.Bind<BaseSpawner>().FromInstance(_baseSpawner).AsSingle();
-        Container.Bind<Robot>().FromInstance(_robot).AsSingle();
+        Container.Bind<Hub<Resource>>().FromInstance(_resourceSpawnSystem.AvailableResources).AsSingle();
         Container.Bind<ResourceViewer>().FromInstance(_resourceViewer).AsSingle();
+        Container.Bind<Robot>().FromInstance(_robotPrefab).AsTransient();
+        Container.Bind<RobotSpawnSystem>().FromInstance(_robotSpawnSystem).AsSingle();
+        Container.Bind<CameraRaycaster>().FromInstance(_raycaster).AsSingle();
 
-        Container.BindInterfacesAndSelfTo<InputReader>().AsSingle();
+
+        Container.BindInterfacesAndSelfTo<InputReader>().FromNew().AsSingle();
     }
 }

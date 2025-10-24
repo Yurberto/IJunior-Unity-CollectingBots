@@ -1,25 +1,28 @@
-using Cysharp.Threading.Tasks;
 using System;
 using System.Threading;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
-public class ResourceSpawner : PoolSpawner<Resource>
+public class ResourceSpawnSystem : MonoBehaviour
 {
-    [Space(16)]
-    [SerializeField] private Transform _spawnpointsContainer;
+    [SerializeField] private Resource _prefab;
+    [SerializeField] private Transform _parentContainer;
     [Space]
+    [SerializeField] private Transform _spawnpointsContainer;
     [SerializeField, Range(0.0f, 50.0f)] private float _spawnDelay = 1.0f;
 
-    private Hub<Resource> _availableResources = new Hub<Resource>();
-    private Hub<Vector3> _availableSpawnpoints = new Hub<Vector3>();
+    PoolSpawner<Resource> _resourceSpawner;
+
+    private Hub<Resource> _availableResources = new();
+    private Hub<Vector3> _availableSpawnpoints = new();
 
     private CancellationTokenSource _cancellationTokenSource;
 
     public Hub<Resource> AvailableResources => _availableResources;
 
-    protected override void Awake()
+    private void Awake()
     {
-        base.Awake();
+        _resourceSpawner = new PoolSpawner<Resource>(_prefab, _parentContainer);
 
         for (int i = 0; i < _spawnpointsContainer.childCount; i++)
             _availableSpawnpoints.Add(_spawnpointsContainer.GetChild(i).position);
@@ -33,29 +36,6 @@ public class ResourceSpawner : PoolSpawner<Resource>
     private void OnDisable()
     {
         StopSpawn();
-    }
-
-    public override Resource Spawn()
-    {
-        if (_availableSpawnpoints.IsEmpty)
-            return null;
-
-        Resource spawned = base.Spawn();
-        spawned.Initialize(_availableSpawnpoints.GetRandom());
-        _availableResources.Add(spawned);
-
-        spawned.ReleaseTimeCome += Release;
-
-        return spawned;
-    }
-
-    protected override void Release(Resource objectToRelease)
-    {
-        base.Release(objectToRelease);
-        objectToRelease.transform.parent = ParentContainer;
-        _availableSpawnpoints.Add(objectToRelease.SpawnPosition);
-
-        objectToRelease.ReleaseTimeCome -= Release;
     }
 
     private void StartSpawn()
@@ -83,5 +63,25 @@ public class ResourceSpawner : PoolSpawner<Resource>
 
             Spawn();
         }
+    }
+
+    private void Spawn()
+    {
+        if (_availableSpawnpoints.IsEmpty)
+            return;
+
+        Resource spawned = _resourceSpawner.Spawn();
+        spawned.Initialize(_availableSpawnpoints.GetRandom());
+        _availableResources.Add(spawned);
+
+        spawned.ReleaseTimeCome += Release;
+    }
+
+    private void Release(Resource objectToRelease)
+    {
+        _resourceSpawner.Release(objectToRelease);
+        _availableSpawnpoints.Add(objectToRelease.SpawnPosition);
+
+        objectToRelease.ReleaseTimeCome -= Release;
     }
 }
