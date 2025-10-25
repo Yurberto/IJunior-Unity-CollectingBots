@@ -34,11 +34,13 @@ public class Game : MonoBehaviour
     {
         if (_baseClicked)
         {
-            if (_raycaster.TryCast(out RaycastHit hit, LayerData.Map) == false)
+            if (_raycaster.TryCast(out RaycastHit hit, LayerData.Map) == false || _distanceChecker.IsPlaceIzolated(Input.mousePosition, _clickedBase.Size, LayerData.Base) == false)
                 return;
 
-            if (_distanceChecker.IsPlaceIzolated(Input.mousePosition, _clickedBase.Size, LayerData.Base) == false)
+            if (_distanceChecker.IsPlaceIzolated(hit.point, _clickedBase.Size, LayerData.Base) == false)
                 return;
+
+            Debug.Log(_clickedBase.Size);
 
             _clickedBase.SetFlag(hit);
             _baseClicked = false;
