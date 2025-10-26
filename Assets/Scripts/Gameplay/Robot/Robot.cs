@@ -22,13 +22,14 @@ public class Robot : MonoBehaviour
 
     public Vector3 BasePosition => _basePosition;
 
-    public void Initialize(Vector3 startPosition)
+    public void Initialize(Vector3 basePosition)
     {
         _currentResource = null;
-        ResourceDelivered = null;
 
-        _basePosition = startPosition;
+        _basePosition = basePosition;
         transform.position = _basePosition;
+
+        Debug.Log(basePosition.ToString());
     }
 
     private void Awake()

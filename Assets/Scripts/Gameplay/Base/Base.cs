@@ -20,7 +20,7 @@ public class Base : MonoBehaviour
 
     private List<Robot> _robots = new();
     private Hub<Robot> _availableRobots = new();
-    private Hub<Vector3> _availableRobotSpawnpoints = new();
+    private Hub<Transform> _availableRobotSpawnpoints = new();
 
     private RobotSpawnSystem _robotSpawner;
     private Hub<Resource> _availableResources;
@@ -46,7 +46,7 @@ public class Base : MonoBehaviour
         _flagController = GetComponent<FlagController>();
 
         for (int i = 0; i < _robotSpawnpointContainer.childCount; i++)
-            _availableRobotSpawnpoints.Add(_robotSpawnpointContainer.GetChild(i).position);
+            _availableRobotSpawnpoints.Add(_robotSpawnpointContainer.GetChild(i));
     }
 
     private void OnEnable()
@@ -142,8 +142,8 @@ public class Base : MonoBehaviour
 
     private void RegisterRobot(Robot robot)
     {
-        Vector3 pos = _availableRobotSpawnpoints.GetRandom();
-        robot.Initialize(pos);
+        Vector3 position = _availableRobotSpawnpoints.GetRandom().position;
+        robot.Initialize(position);
         robot.transform.parent = transform;
 
         _robots.Add(robot);
@@ -167,6 +167,11 @@ public class Base : MonoBehaviour
 
     private void OnResourceDelivered(Robot deliveryRobot, Resource resource)
     {
+        if (resource == null)
+            Debug.Log("REs");
+        if (deliveryRobot == null)
+            Debug.Log("Robot");
+
         _availableRobots.Add(deliveryRobot);
 
         resource.InvokeRelease();

@@ -63,7 +63,5 @@ public class ResourceMonitor
 
         if (Count.Value - CreateCostData.BaseCost >= 0)
             CreateBaseAvailable?.Invoke();
-
-        Debug.Log(Count.Value.ToString());
     }
 }
