@@ -9,8 +9,8 @@ public class Robot : MonoBehaviour
 {
     [SerializeField, Range(0.0f, 5.0f)] private float _reachedDistance = 1.0f;
 
-    private Mover _mover;
-    private ResourceDeliverer _resourceDeliverer;
+    [SerializeField] private Mover _mover;
+    [SerializeField] private ResourceDeliverer _resourceDeliverer;
 
     private Resource _currentResource;
 
@@ -28,14 +28,6 @@ public class Robot : MonoBehaviour
 
         _startPosition = positionOnBase;
         transform.position = _startPosition;
-
-        Debug.Log(positionOnBase.ToString());
-    }
-
-    private void Awake()
-    {
-        _mover = GetComponent<Mover>();
-        _resourceDeliverer = GetComponent<ResourceDeliverer>();
     }
 
     private void Start()

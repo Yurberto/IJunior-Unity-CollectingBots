@@ -5,6 +5,7 @@ public class Game : MonoBehaviour
 {
     [SerializeField] private BaseSpawnSystem _baseSpawnSystem;
     [SerializeField] private RobotSpawnSystem _robotSpawnSystem;
+    [SerializeField] private ResourceViewer _resourceViewer;
 
     private DistanceChecker _distanceChecker = new();
 
@@ -33,7 +34,8 @@ public class Game : MonoBehaviour
 
     private void Start()
     {
-        _baseSpawnSystem.Spawn(_robotSpawnSystem.Spawn(), Vector3.zero);
+        Base firstBase = _baseSpawnSystem.Spawn(_robotSpawnSystem.Spawn(), Vector3.zero);
+        _resourceViewer.Add(firstBase.ResourceMonitor);
     }
 
     private void HandleClick()
@@ -58,7 +60,7 @@ public class Game : MonoBehaviour
             if (hit.transform.TryGetComponent(out Base @base) == false)
                 return;
 
-            if (@base.CanCreateNew == false)
+            if (@base.CanSetFlag == false)
                 return;
 
             _clickedBase = @base;
@@ -71,6 +73,7 @@ public class Game : MonoBehaviour
     {
         _clickedBase.RobotReachedFlag -= SpawnNewBase;
 
-        _baseSpawnSystem.Spawn(startRobot, spawnPosition);
+        Base spawnedBase = _baseSpawnSystem.Spawn(startRobot, spawnPosition);
+        _resourceViewer.Add(spawnedBase.ResourceMonitor);
     }
 }

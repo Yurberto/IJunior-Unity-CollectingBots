@@ -77,6 +77,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _reachedDistance: 1
+  _mover: {fileID: 2230171051401057841}
+  _resourceDeliverer: {fileID: 6669856275035092944}
 --- !u!114 &2230171051401057841
 MonoBehaviour:
   m_ObjectHideFlags: 0

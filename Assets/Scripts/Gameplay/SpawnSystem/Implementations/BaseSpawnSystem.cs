@@ -23,10 +23,12 @@ public class BaseSpawnSystem : MonoBehaviour
         _baseSpawner = new Spawner<Base>(_basePrefab, _baseContainer);
     }
 
-    public void Spawn(Robot startRobot, Vector3 spawnPosition)
+    public Base Spawn(Robot startRobot, Vector3 spawnPosition)
     {
         Base spawnedBase = _baseSpawner.Spawn();
         spawnedBase.transform.position = spawnPosition;
         spawnedBase.Initialize(startRobot, _robotSpawner, _availableResources);
+
+        return spawnedBase;
     }
 }

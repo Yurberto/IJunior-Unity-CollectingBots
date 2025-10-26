@@ -11,7 +11,9 @@ public class Base : MonoBehaviour
     [SerializeField] private BaseRenderer _baseRenderer;
     [SerializeField] private Transform _robotSpawnpointContainer;
 
-    [SerializeField, Range(0.0f, 10.0f)] private float _workDelay = 0.5f;   
+    [SerializeField, Range(0.0f, 10.0f)] private float _workDelay = 0.5f;
+
+    private bool _isClicked = false;
 
     private Collider _collider;
     private FlagController _flagController;
@@ -30,7 +32,8 @@ public class Base : MonoBehaviour
     public event Action<Robot, Vector3> RobotReachedFlag;
 
     public Vector3 Size => _collider.bounds.size;
-    public bool CanCreateNew => _robots.Count > 1;
+    public bool CanSetFlag => _robots.Count > 1 && _isClicked == false;
+    public ResourceMonitor ResourceMonitor => _resourceMonitor;
 
     public void Initialize(Robot startRobot, RobotSpawnSystem robotSpawner, Hub<Resource> availableResources)
     {
@@ -68,16 +71,17 @@ public class Base : MonoBehaviour
     public void OnClick()
     {
         _baseRenderer.OnClick();
+        _isClicked = true;
     }
 
     public void SetFlag(RaycastHit hit)
     {
         _flagController.PutOn(hit);
         _baseRenderer.OnFlagSet();
-        CollectForNewBase();
+        ChangePriority();
     }
 
-    private void CollectForNewBase()
+    private void ChangePriority()
     {
         _resourceMonitor.CreateRobotAvailable -= SpawnRobot;
         _resourceMonitor.CreateBaseAvailable += SendRobotToFlag;
@@ -100,7 +104,7 @@ public class Base : MonoBehaviour
 
         await UniTask.WaitUntil(() => _availableRobots.Count > 0);
 
-        Robot robotCreator = _availableRobots.GetRandom();
+        Robot robotCreator = _availableRobots.TakeRandom();
         _robots.Remove(robotCreator);
 
         await robotCreator.GoToFlag(_flagController.Flag);
@@ -111,6 +115,8 @@ public class Base : MonoBehaviour
         _baseRenderer.OnDefault();
 
         _resourceMonitor.CreateRobotAvailable += SpawnRobot;
+
+        _isClicked = false;
     }
 
     private async UniTaskVoid StartCollecting()
@@ -124,8 +130,8 @@ public class Base : MonoBehaviour
             if (_availableRobots.IsEmpty ||  _availableResources.IsEmpty)
                 continue;
 
-            Robot robot = _availableRobots.GetRandom();
-            Resource resource = _availableResources.GetRandom();
+            Robot robot = _availableRobots.TakeRandom();
+            Resource resource = _availableResources.TakeRandom();
 
             robot.GoPickUp(resource);
             robot.ResourceDelivered += OnResourceDelivered;
@@ -141,7 +147,7 @@ public class Base : MonoBehaviour
 
     private void RegisterRobot(Robot robot)
     {
-        Vector3 position = _availableRobotSpawnpoints.GetRandom().position;
+        Vector3 position = _availableRobotSpawnpoints.TakeRandom().position;
         robot.Initialize(position);
         robot.transform.parent = transform;
 

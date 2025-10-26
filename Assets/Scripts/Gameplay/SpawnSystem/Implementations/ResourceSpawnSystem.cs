@@ -71,7 +71,7 @@ public class ResourceSpawnSystem : MonoBehaviour
             return;
 
         Resource spawned = _resourceSpawner.Spawn();
-        spawned.Initialize(_availableSpawnpoints.GetRandom());
+        spawned.Initialize(_availableSpawnpoints.TakeRandom());
         _availableResources.Add(spawned);
 
         spawned.ReleaseTimeCome += Release;

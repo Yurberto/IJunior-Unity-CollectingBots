@@ -1,41 +1,45 @@
 using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using Debug = UnityEngine.Debug;
+using UnityEngine;
 
 public class ResourceMonitor
 {
     private int _maxCount;
     private float _checkDelay;
 
+    private int _count = 0;
+
     private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
 
     public event Action CreateRobotAvailable;
     public event Action CreateBaseAvailable;
 
-    public ReactiveProperty<int> Count { get; private set; } = new();
+    public int Count => _count;
 
     public ResourceMonitor(float checkMoneyAmountDelay = 0.5f, int count = 0, int maxCount = 1000)
     {
         _checkDelay = checkMoneyAmountDelay;
-        Count.Value = count;
+        _count = count;
         _maxCount = maxCount;
     }
 
     public void AddResource()
     {
-        if (Count.Value >= _maxCount)
+        if (_count >= _maxCount)
             return;
 
-        Count.Value++;
+        _count++;
+
+        Debug.Log(Count);
     }
 
     public bool TrySpend(int cost)
     {
-        if (cost < 0 || cost > Count.Value)
+        if (cost < 0 || cost > _count)
             return false;
 
-        Count.Value -= cost;
+        _count -= cost;
 
         return true;
     }
@@ -58,10 +62,10 @@ public class ResourceMonitor
 
     private void CheckMoneyAmount()
     {
-        if (Count.Value - CreateCostData.RobotCost >= 0)
+        if (_count - CreateCostData.RobotCost >= 0)
             CreateRobotAvailable?.Invoke();
 
-        if (Count.Value - CreateCostData.BaseCost >= 0)
+        if (_count - CreateCostData.BaseCost >= 0)
             CreateBaseAvailable?.Invoke();
     }
 }

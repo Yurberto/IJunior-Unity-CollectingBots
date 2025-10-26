@@ -23,7 +23,7 @@ public class Hub<T>
         _objects.Add(@object);
     }
 
-    public T GetRandom()
+    public T TakeRandom()
     {
         if (_objects == null || _objects.Count == 0)
             throw new System.NullReferenceException();
