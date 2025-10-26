@@ -30,8 +30,6 @@ public class ResourceMonitor
             return;
 
         _count++;
-
-        Debug.Log(Count);
     }
 
     public bool TrySpend(int cost)

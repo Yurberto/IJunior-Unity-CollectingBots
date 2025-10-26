@@ -16,7 +16,7 @@ public class Robot : MonoBehaviour
 
     private Vector3 _startPosition;
 
-    private CancellationTokenSource _cancellationTokenSource;
+    private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
 
     public event Action<Robot, Resource> ResourceDelivered;
 
@@ -28,11 +28,6 @@ public class Robot : MonoBehaviour
 
         _startPosition = positionOnBase;
         transform.position = _startPosition;
-    }
-
-    private void Start()
-    {
-        _cancellationTokenSource = new CancellationTokenSource();
     }
 
     private void OnDisable()
@@ -63,6 +58,11 @@ public class Robot : MonoBehaviour
 
     private async UniTaskVoid PickUpAsync()
     {
+        if (_currentResource == null)
+            Debug.Log("NULL_RESOURCE");
+        if (_resourceDeliverer == null)
+            Debug.Log("NULL_Delivirer");
+
         await UniTask.WaitUntil(() => IsOnPosiotion(_currentResource.SpawnPosition), cancellationToken: _cancellationTokenSource.Token);
 
         _resourceDeliverer.PickUp(_currentResource);
