@@ -754,7 +754,7 @@ GameObject:
   - component: {fileID: 1057320412}
   - component: {fileID: 1057320411}
   - component: {fileID: 1057320410}
-  m_Layer: 9
+  m_Layer: 0
   m_Name: BackGround
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1160,7 +1160,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _resourceSpawnSystem: {fileID: 1368437920}
   _robotSpawnSystem: {fileID: 337400431}
-  _resourceViewer: {fileID: 1500910266}
   _raycaster: {fileID: 1519145446}
 --- !u!114 &1594481028 stripped
 MonoBehaviour:
