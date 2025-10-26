@@ -62,9 +62,6 @@ public class Base : MonoBehaviour
         StopCollecting();
         _resourceMonitor.StopCheckMoneyAmount();
 
-        for (int i = 0; i < _robots.Count; i++)
-            _robots[i].ResourceDelivered -= OnResourceDelivered;
-
         _resourceMonitor.CreateRobotAvailable -= SpawnRobot;
     }
 
@@ -104,7 +101,6 @@ public class Base : MonoBehaviour
         await UniTask.WaitUntil(() => _availableRobots.Count > 0);
 
         Robot robotCreator = _availableRobots.GetRandom();
-        robotCreator.ResourceDelivered -= OnResourceDelivered;
         _robots.Remove(robotCreator);
 
         await robotCreator.GoToFlag(_flagController.Flag);
@@ -113,6 +109,8 @@ public class Base : MonoBehaviour
 
         _flagController.Remove();
         _baseRenderer.OnDefault();
+
+        _resourceMonitor.CreateRobotAvailable += SpawnRobot;
     }
 
     private async UniTaskVoid StartCollecting()
@@ -130,6 +128,7 @@ public class Base : MonoBehaviour
             Resource resource = _availableResources.GetRandom();
 
             robot.GoPickUp(resource);
+            robot.ResourceDelivered += OnResourceDelivered;
         }
     }
 
@@ -148,8 +147,6 @@ public class Base : MonoBehaviour
 
         _robots.Add(robot);
         _availableRobots.Add(robot);
-
-        robot.ResourceDelivered += OnResourceDelivered;
     }
 
     private void SpawnRobot()
@@ -167,11 +164,7 @@ public class Base : MonoBehaviour
 
     private void OnResourceDelivered(Robot deliveryRobot, Resource resource)
     {
-        if (resource == null)
-            Debug.Log("REs");
-        if (deliveryRobot == null)
-            Debug.Log("Robot");
-
+        deliveryRobot.ResourceDelivered -= OnResourceDelivered;
         _availableRobots.Add(deliveryRobot);
 
         resource.InvokeRelease();

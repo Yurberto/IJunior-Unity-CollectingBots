@@ -14,22 +14,22 @@ public class Robot : MonoBehaviour
 
     private Resource _currentResource;
 
-    private Vector3 _basePosition;
+    private Vector3 _startPosition;
 
     private CancellationTokenSource _cancellationTokenSource;
 
     public event Action<Robot, Resource> ResourceDelivered;
 
-    public Vector3 BasePosition => _basePosition;
+    public Vector3 BasePosition => _startPosition;
 
-    public void Initialize(Vector3 basePosition)
+    public void Initialize(Vector3 positionOnBase)
     {
         _currentResource = null;
 
-        _basePosition = basePosition;
-        transform.position = _basePosition;
+        _startPosition = positionOnBase;
+        transform.position = _startPosition;
 
-        Debug.Log(basePosition.ToString());
+        Debug.Log(positionOnBase.ToString());
     }
 
     private void Awake()
@@ -80,14 +80,14 @@ public class Robot : MonoBehaviour
     private void BackToBase()
     {
         _resourceDeliverer.PickUp(_currentResource);
-        _mover.MoveTo(_basePosition);
+        _mover.MoveTo(_startPosition);
         
         PutInOnBase().Forget();
     }
 
     private async UniTaskVoid PutInOnBase()
     {
-        await UniTask.WaitUntil(() => IsOnPosiotion(_basePosition), cancellationToken: _cancellationTokenSource.Token);
+        await UniTask.WaitUntil(() => IsOnPosiotion(_startPosition), cancellationToken: _cancellationTokenSource.Token);
 
         PutIn();
         _mover.Stop();
@@ -100,7 +100,7 @@ public class Robot : MonoBehaviour
         _currentResource = null;
 
         transform.rotation = Quaternion.identity;
-        transform.position = _basePosition;
+        transform.position = _startPosition;
     }
 
     private bool IsOnPosiotion(Vector3 position)
