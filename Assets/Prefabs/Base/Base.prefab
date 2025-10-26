@@ -392,7 +392,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _flagPrefab: {fileID: 1924130144875391247, guid: 32813af10183c1e4b9b77a6c9e66a113, type: 3}
-  _surfaceOffset: 1.5
+  _surfaceOffset: 0
 --- !u!1 &3298247040545734730
 GameObject:
   m_ObjectHideFlags: 0
@@ -723,7 +723,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _defaultColor: {r: 1, g: 0.89008415, b: 0, a: 1}
-  _clickedColor: {r: 1, g: 0, b: 0, a: 1}
+  _clickedColor: {r: 0.87208223, g: 0, b: 1, a: 1}
+  _flagSetColor: {r: 0, g: 0, b: 0, a: 1}
 --- !u!1 &7156939938556619299
 GameObject:
   m_ObjectHideFlags: 0

@@ -26,7 +26,7 @@ public class Hub<T>
     public T GetRandom()
     {
         if (_objects == null || _objects.Count == 0)
-            throw new System.Exception(null);
+            throw new System.NullReferenceException();
 
         int randomIndex = Random.Range(0, _objects.Count);
         T randomObject = _objects[randomIndex];

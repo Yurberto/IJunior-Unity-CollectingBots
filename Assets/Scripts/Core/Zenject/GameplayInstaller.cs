@@ -3,8 +3,6 @@ using Zenject;
 
 public sealed class GameplayInstaller : MonoInstaller
 {
-    [SerializeField] private Robot _robotPrefab;
-    [Space(16)]
     [SerializeField] private ResourceSpawnSystem _resourceSpawnSystem;
     [SerializeField] private RobotSpawnSystem _robotSpawnSystem;
     [SerializeField] private ResourceViewer _resourceViewer;
@@ -14,7 +12,6 @@ public sealed class GameplayInstaller : MonoInstaller
     {
         Container.Bind<Hub<Resource>>().FromInstance(_resourceSpawnSystem.AvailableResources).AsSingle();
         Container.Bind<ResourceViewer>().FromInstance(_resourceViewer).AsSingle();
-        Container.Bind<Robot>().FromInstance(_robotPrefab).AsTransient();
         Container.Bind<RobotSpawnSystem>().FromInstance(_robotSpawnSystem).AsSingle();
         Container.Bind<CameraRaycaster>().FromInstance(_raycaster).AsSingle();
 

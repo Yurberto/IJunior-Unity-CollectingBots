@@ -7,9 +7,11 @@ public class FlagController : MonoBehaviour
 
     private Flag _flag;
 
+    public Flag Flag => _flag;
+
     private void Start()
     {
-        _flag = Instantiate(_flagPrefab);
+        _flag = Instantiate(_flagPrefab, transform);
         Remove();
     }
 

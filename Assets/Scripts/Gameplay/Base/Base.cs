@@ -27,11 +27,14 @@ public class Base : MonoBehaviour
 
     private CancellationTokenSource _cancellationTokenSource;
 
+    public event Action<Robot, Vector3> RobotReachedFlag;
+
     public Vector3 Size => _collider.bounds.size;
+    public bool CanCreateNew => _robots.Count > 1;
 
     public void Initialize(Robot startRobot, RobotSpawnSystem robotSpawner, Hub<Resource> availableResources)
     {
-        InitStartRobot(startRobot);
+        RegisterRobot(startRobot);
         _robotSpawner = robotSpawner;
         _availableResources = availableResources;
     }
@@ -48,7 +51,7 @@ public class Base : MonoBehaviour
 
     private void OnEnable()
     {
-        StartWork().Forget();
+        StartCollecting().Forget();
         _resourceMonitor.CheckMoneyAmountAsync().Forget();
 
         _resourceMonitor.CreateRobotAvailable += SpawnRobot;
@@ -56,7 +59,7 @@ public class Base : MonoBehaviour
 
     private void OnDisable()
     {
-        StopWork();
+        StopCollecting();
         _resourceMonitor.StopCheckMoneyAmount();
 
         for (int i = 0; i < _robots.Count; i++)
@@ -65,17 +68,54 @@ public class Base : MonoBehaviour
         _resourceMonitor.CreateRobotAvailable -= SpawnRobot;
     }
 
-    public void SwitchState()
+    public void OnClick()
     {
-        _baseRenderer.SwitchColor();
+        _baseRenderer.OnClick();
     }
 
     public void SetFlag(RaycastHit hit)
     {
         _flagController.PutOn(hit);
+        _baseRenderer.OnFlagSet();
+        CollectForNewBase();
     }
 
-    private async UniTaskVoid StartWork()
+    private void CollectForNewBase()
+    {
+        _resourceMonitor.CreateRobotAvailable -= SpawnRobot;
+        _resourceMonitor.CreateBaseAvailable += SendRobotToFlag;
+    }
+
+    private void SendRobotToFlag()
+    {
+        SendRobotToFlagAsync().Forget();
+    }
+
+    private async UniTaskVoid SendRobotToFlagAsync()
+    {
+        if (_flagController.Flag.enabled == false)
+            return;
+
+        if (_resourceMonitor.TrySpend(CreateCostData.BaseCost) == false)
+            return;
+
+        _resourceMonitor.CreateBaseAvailable -= SendRobotToFlag;
+
+        await UniTask.WaitUntil(() => _availableRobots.Count > 0);
+
+        Robot robotCreator = _availableRobots.GetRandom();
+        robotCreator.ResourceDelivered -= OnResourceDelivered;
+        _robots.Remove(robotCreator);
+
+        await robotCreator.GoToFlag(_flagController.Flag);
+
+        RobotReachedFlag?.Invoke(robotCreator, _flagController.Flag.transform.position);
+
+        _flagController.Remove();
+        _baseRenderer.OnDefault();
+    }
+
+    private async UniTaskVoid StartCollecting()
     {
         _cancellationTokenSource = new CancellationTokenSource();
 
@@ -93,19 +133,23 @@ public class Base : MonoBehaviour
         }
     }
 
-    private void StopWork()
+    private void StopCollecting()
     {
         _cancellationTokenSource.Cancel();
         _cancellationTokenSource.Dispose();
         _cancellationTokenSource = null;
     }
 
-    private void InitStartRobot(Robot robot)
+    private void RegisterRobot(Robot robot)
     {
-        robot.Initialize(_availableRobotSpawnpoints.GetRandom());
-        robot.ResourceDelivered += OnResourceDelivered;
+        Vector3 pos = _availableRobotSpawnpoints.GetRandom();
+        robot.Initialize(pos);
+        robot.transform.parent = transform;
+
         _robots.Add(robot);
         _availableRobots.Add(robot);
+
+        robot.ResourceDelivered += OnResourceDelivered;
     }
 
     private void SpawnRobot()
@@ -115,13 +159,10 @@ public class Base : MonoBehaviour
 
         if (_resourceMonitor.TrySpend(CreateCostData.RobotCost) == false)
             return;
-        Robot spawned = _robotSpawner.Spawn();
-        spawned.Initialize(_availableRobotSpawnpoints.GetRandom());
 
-        _robots.Add(spawned);
-        _availableRobots.Add(spawned);
-        
-        spawned.ResourceDelivered += OnResourceDelivered;
+        Robot spawned = _robotSpawner.Spawn();
+
+        RegisterRobot(spawned);
     }
 
     private void OnResourceDelivered(Robot deliveryRobot, Resource resource)

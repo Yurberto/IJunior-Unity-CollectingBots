@@ -14,16 +14,21 @@ public class Robot : MonoBehaviour
 
     private Resource _currentResource;
 
-    private Vector3 _startPosition;
+    private Vector3 _basePosition;
 
     private CancellationTokenSource _cancellationTokenSource;
 
     public event Action<Robot, Resource> ResourceDelivered;
 
+    public Vector3 BasePosition => _basePosition;
+
     public void Initialize(Vector3 startPosition)
     {
-        _startPosition = startPosition;
-        transform.position = _startPosition;
+        _currentResource = null;
+        ResourceDelivered = null;
+
+        _basePosition = startPosition;
+        transform.position = _basePosition;
     }
 
     private void Awake()
@@ -47,6 +52,14 @@ public class Robot : MonoBehaviour
         _cancellationTokenSource = null;
     }
 
+    public async UniTask GoToFlag(Flag flag)
+    {
+        _mover.MoveTo(flag.transform.position);
+
+        await UniTask.WaitUntil(() => IsOnPosiotion(flag.transform.position), cancellationToken: _cancellationTokenSource.Token);
+        _mover.Stop();
+    }
+
     public void GoPickUp(Resource target)
     {
         _currentResource = target;
@@ -66,14 +79,14 @@ public class Robot : MonoBehaviour
     private void BackToBase()
     {
         _resourceDeliverer.PickUp(_currentResource);
-        _mover.MoveTo(_startPosition);
+        _mover.MoveTo(_basePosition);
         
         PutInOnBase().Forget();
     }
 
     private async UniTaskVoid PutInOnBase()
     {
-        await UniTask.WaitUntil(() => IsOnPosiotion(_startPosition), cancellationToken: _cancellationTokenSource.Token);
+        await UniTask.WaitUntil(() => IsOnPosiotion(_basePosition), cancellationToken: _cancellationTokenSource.Token);
 
         PutIn();
         _mover.Stop();
@@ -86,7 +99,7 @@ public class Robot : MonoBehaviour
         _currentResource = null;
 
         transform.rotation = Quaternion.identity;
-        transform.position = _startPosition;
+        transform.position = _basePosition;
     }
 
     private bool IsOnPosiotion(Vector3 position)

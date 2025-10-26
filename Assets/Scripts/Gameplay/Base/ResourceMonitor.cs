@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using Debug = UnityEngine.Debug;
 
 public class ResourceMonitor
 {
@@ -10,6 +11,7 @@ public class ResourceMonitor
     private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
 
     public event Action CreateRobotAvailable;
+    public event Action CreateBaseAvailable;
 
     public ReactiveProperty<int> Count { get; private set; } = new();
 
@@ -58,5 +60,10 @@ public class ResourceMonitor
     {
         if (Count.Value - CreateCostData.RobotCost >= 0)
             CreateRobotAvailable?.Invoke();
+
+        if (Count.Value - CreateCostData.BaseCost >= 0)
+            CreateBaseAvailable?.Invoke();
+
+        Debug.Log(Count.Value.ToString());
     }
 }

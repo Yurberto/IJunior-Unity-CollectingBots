@@ -4,6 +4,7 @@ using Zenject;
 public class Game : MonoBehaviour
 {
     [SerializeField] private BaseSpawnSystem _baseSpawnSystem;
+    [SerializeField] private RobotSpawnSystem _robotSpawnSystem;
 
     private DistanceChecker _distanceChecker = new();
 
@@ -30,6 +31,11 @@ public class Game : MonoBehaviour
         _inputReader.MouseClicked -= HandleClick;
     }
 
+    private void Start()
+    {
+        _baseSpawnSystem.Spawn(_robotSpawnSystem.Spawn(), Vector3.zero);
+    }
+
     private void HandleClick()
     {
         if (_baseClicked)
@@ -40,9 +46,8 @@ public class Game : MonoBehaviour
             if (_distanceChecker.IsPlaceIzolated(hit.point, _clickedBase.Size, LayerData.Base) == false)
                 return;
 
-            Debug.Log(_clickedBase.Size);
-
             _clickedBase.SetFlag(hit);
+            _clickedBase.RobotReachedFlag += SpawnNewBase;
             _baseClicked = false;
         }
         else
@@ -53,10 +58,19 @@ public class Game : MonoBehaviour
             if (hit.transform.TryGetComponent(out Base @base) == false)
                 return;
 
+            if (@base.CanCreateNew == false)
+                return;
+
             _clickedBase = @base;
+            _clickedBase.OnClick();
             _baseClicked = true;
         }
+    }
 
-        _clickedBase.SwitchState();
+    private void SpawnNewBase(Robot startRobot, Vector3 spawnPosition)
+    {
+        _clickedBase.RobotReachedFlag -= SpawnNewBase;
+
+        _baseSpawnSystem.Spawn(startRobot, spawnPosition);
     }
 }
