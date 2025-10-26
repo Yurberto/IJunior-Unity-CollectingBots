@@ -16,7 +16,7 @@ public class BaseRenderer : MonoBehaviour
 
     private void Start()
     {
-        _renderer.material.color = _defaultColor;
+        OnDefault();
     }
 
     public void OnDefault()
